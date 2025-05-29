@@ -4,11 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ user_profile.user.username }} | Perfil | Rede Social Tech</title>
+    <title>Perfil de {{ profile_user.user.username }} | Rede Social Tech</title>
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
     <script>
-        // JavaScript para toggleOptions (sem alterações)
-        // ... (copie o mesmo script do feed.html) ...
         function toggleOptions(postId) {
             const dropdown = document.getElementById('options-dropdown-' + postId);
             if (dropdown) {
@@ -43,7 +41,6 @@
     </script>
 </head>
 <body>
-    {% comment %} Bloco de Mensagens do Django Adicionado Aqui {% endcomment %}
     {% if messages %}
         <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
             {% for message in messages %}
@@ -80,7 +77,7 @@
         <nav class="nav-links">
             <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
             <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
-            <a href="{% url 'perfil' %}" {% if request.resolver_match.url_name == 'perfil' %}class="active"{% endif %}>Meu Perfil</a>
+            <a href="{% url 'meu_perfil' %}" {% if request.resolver_match.url_name == 'meu_perfil' %}class="active"{% endif %}>Meu Perfil</a>
             {% if user.is_authenticated %}
                 <span class="nav-user-info">Olá, {{ user.username }}</span>
                 <form action="{% url 'logout' %}" method="post" class="nav-button-form">
@@ -97,21 +94,17 @@
     <main class="main-container">
         <div class="profile-header-card">
             <div class="profile-avatar-large">
-                {{ user_profile.user.username|slice:":1"|upper }}
+                {{ profile_user.user.username|slice:":1"|upper }}
             </div>
-            <h1 class="profile-username">{{ user_profile.user.username }}</h1>
-            {% if user_profile.bio %}
-                <p class="profile-bio">{{ user_profile.bio }}</p>
-            {% endif %}
-            {% if user_profile.area_tecnologia %}
-                <p class="profile-tech-area">Área de Tecnologia: {{ user_profile.area_tecnologia }}</p>
-            {% endif %}
+            <h1 class="profile-username">{{ profile_user.user.username }}</h1>
+            {% if profile_user.bio %}<p class="profile-bio">{{ profile_user.bio }}</p>{% endif %}
+            {% if profile_user.area_tecnologia %}<p class="profile-tech-area">Área de Tecnologia: {{ profile_user.area_tecnologia }}</p>{% endif %}
         </div>
 
-        {% if user.profile == user_profile %}
+        {% if is_own_profile %}
         <section class="profile-edit-form-section form-card">
-            <h3>Editar Perfil</h3>
-            <form method="post">
+            <h3>Editar Meu Perfil</h3>
+            <form method="post" action="{% url 'meu_perfil' %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="{{ profile_edit_form.bio.id_for_label }}">{{ profile_edit_form.bio.label }}</label>
@@ -129,7 +122,7 @@
         {% endif %}
 
         <section class="user-posts-section">
-            <h3>Meus Posts</h3>
+            <h3>Posts de {{ profile_user.user.username }}</h3>
             {% if posts %}
                 {% for post in posts %}
                     <article class="post-card" id="post-{{ post.id }}">
@@ -138,10 +131,16 @@
                                 {{ post.autor.user.username|slice:":1"|upper }}
                             </div>
                             <div class="post-author-info">
-                                <a href="#" class="author-name">{{ post.autor.user.username }}</a>
+                                {# Se o autor do post for o mesmo do perfil sendo visualizado, não precisa de link. #}
+                                {# Caso contrário, link para o perfil do autor do post. #}
+                                {% if post.autor.user.username == profile_user.user.username %}
+                                    <span class="author-name">{{ post.autor.user.username }}</span>
+                                {% else %}
+                                    <a href="{% url 'user_profile' username=post.autor.user.username %}" class="author-name">{{ post.autor.user.username }}</a>
+                                {% endif %}
                                 <span class="post-timestamp">{{ post.criado_em|date:"d M, Y \à\s H:i" }}</span>
                             </div>
-                            {% if post.autor == user.profile %}
+                            {% if post.autor.user == user %}
                             <div class="post-options">
                                 <button class="options-button" id="options-button-{{ post.id }}" onclick="event.stopPropagation(); toggleOptions({{ post.id }})">&#x22EE;</button>
                                 <div class="options-dropdown" id="options-dropdown-{{ post.id }}">
@@ -155,11 +154,29 @@
                             <p>{{ post.texto|linebreaksbr }}</p>
                         </div>
                         <footer class="post-card-actions">
-                            <button class="action-button"><span class="icon">&#x2764;&#xFE0F;</span>Curtir</button>
-                            <button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button>
-                            <button class="action-button"><span class="icon">&#x1F501;</span>Compartilhar</button>
+                            <div class="action-item">
+                                <form action="{% url 'like_post' post_id=post.id %}" method="POST" class="like-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}#post-{{ post.id }}">
+                                    {% if user in post.curtidas.all %}
+                                        <button type="submit" class="action-button liked-button">
+                                            <span class="icon">&#x2764;&#xFE0F;</span> Descurtir
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="action-button">
+                                            <span class="icon">&#x1F90D;</span> Curtir
+                                        </button>
+                                    {% endif %}
+                                </form>
+                                <span class="like-count">{{ post.curtidas.count }} curtida{{ post.curtidas.count|pluralize:"s" }}</span>
+                            </div>
+                            <div class="action-item">
+                                <button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button>
+                            </div>
+                            <div class="action-item">
+                                <button class="action-button"><span class="icon">&#x1F501;</span>Compartilhar</button>
+                            </div>
                         </footer>
-
                         <section class="comments-section">
                             <div class="add-comment-form">
                                 {% if user.is_authenticated %}
@@ -173,17 +190,11 @@
                                             {{ comment_form.texto }}
                                             <button type="submit" class="btn-comment-submit">Comentar</button>
                                         </div>
-                                        {% if comment_form.texto.errors %}
-                                            <ul class="errorlist">
-                                                {% for error in comment_form.texto.errors %}<li>{{ error }}</li>{% endfor %}
-                                            </ul>
-                                        {% endif %}
                                     </form>
                                 {% else %}
                                     <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.get_full_path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
                                 {% endif %}
                             </div>
-
                             <div class="comments-list">
                                 {% for comment in post.comments.all %}
                                     <div class="comment">
@@ -191,7 +202,7 @@
                                             {{ comment.autor.user.username|slice:":1"|upper }}
                                         </div>
                                         <div class="comment-content">
-                                            <span class="comment-author">{{ comment.autor.user.username }}</span>
+                                             <a href="{% url 'user_profile' username=comment.autor.user.username %}" class="comment-author">{{ comment.autor.user.username }}</a>
                                             <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
                                             <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>
                                         </div>
@@ -204,7 +215,13 @@
                     </article>
                 {% endfor %}
             {% else %}
-                <p class="no-posts">Você ainda não fez nenhuma postagem.</p>
+                <p class="no-posts">
+                    {% if is_own_profile %}
+                        Você ainda não fez nenhuma postagem.
+                    {% else %}
+                        {{ profile_user.user.username }} ainda não fez nenhuma postagem.
+                    {% endif %}
+                </p>
             {% endif %}
         </section>
     </main>

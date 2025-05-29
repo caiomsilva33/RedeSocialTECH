@@ -493,3 +493,77 @@ a:hover {
     margin-top: 5px;
     margin-left: 42px; /* Alinha com o campo de texto, após o avatar */
 }
+
+.post-card-actions {
+    padding: 8px 16px;
+    border-top: 1px solid var(--cor-fundo-principal);
+    display: flex;
+    justify-content: space-around; /* Para espaçar os itens de ação */
+    align-items: center;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Espaço entre o botão e a contagem, ou entre botões */
+}
+
+.like-form {
+    display: inline-block; /* Para que o formulário não quebre a linha e permita gap */
+    margin: 0; /* Reset de margem do formulário */
+    padding: 0; /* Reset de padding do formulário */
+}
+
+.action-button {
+    background: none;
+    border: none;
+    color: var(--cor-texto-secundario);
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    font-family: inherit; /* Garante consistência da fonte */
+}
+.action-button:hover {
+    background-color: var(--cor-borda);
+    color: var(--cor-texto-principal);
+}
+.action-button .icon {
+    margin-right: 6px;
+    font-size: 1.2em;
+    line-height: 1; /* Para melhor alinhamento vertical do ícone */
+}
+
+/* Estilo específico para o botão quando o post está curtido */
+.action-button.liked-button .icon {
+    color: var(--cor-perigo); /* Coração vermelho quando curtido */
+}
+/* Se quiser que o texto "Descurtir" também fique vermelho: */
+.action-button.liked-button {
+     /* color: var(--cor-perigo); */ /* Descomente se quiser o texto vermelho */
+}
+.action-button.liked-button:hover {
+    /* background-color: rgba(231, 76, 60, 0.1); */ /* Exemplo de hover para botão curtido */
+    /* color: var(--cor-perigo-hover); */
+}
+
+.like-count, .comment-count {
+    font-size: 0.85em;
+    color: var(--cor-texto-secundario);
+    margin-left: 4px; /* Pequena margem se o contador estiver separado do botão */
+}
+
+/* Ajuste para .action-item se precisar de mais espaço ou alinhamento específico */
+.post-card-actions .action-item {
+    /* Exemplo: flex-grow: 1; text-align: center; */
+}
+
+/* --- Estilos para a Seção de Comentários (do Turno 32, para referência) --- */
+.comments-section {
+    padding: 10px 16px 16px 16px;
+    border-top: 1px solid var(--cor-fundo-principal);
+    background-color: var(--cor-fundo-elemento);
+}
