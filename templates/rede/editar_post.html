@@ -36,6 +36,7 @@
             });
         </script>
     {% endif %}
+
     <header class="header">
         <div class="header-brand">
             <a href="{% url 'feed' %}">RedeSocial Tech</a>
@@ -80,6 +81,7 @@
                 <button type="submit" class="btn-submit btn-primary">Salvar Alterações</button>
             </form>
             <div class="link-text" style="margin-top: 15px;">
+                {# Link "Cancelar" simplificado #}
                 <a href="{% url 'feed' %}">Cancelar e Voltar para o Feed</a>
             </div>
         </div>
