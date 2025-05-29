@@ -12,4 +12,5 @@ urlpatterns = [
     path('post/<int:post_id>/apagar/', views.apagar_post, name='apagar_post'),
     path('post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
     path('post/<int:post_id>/like/', views.like_post_view, name='like_post'),
+    path('usuarios/pesquisa/', views.user_search_results_view, name='user_search_results'),
 ]

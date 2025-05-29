@@ -74,6 +74,14 @@
         <div class="header-brand">
             <a href="{% url 'feed' %}">RedeSocial Tech</a>
         </div>
+
+        <div class="search-container">
+            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
+                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q }}">
+                <button type="submit" class="search-button">&#x1F50D;</button>
+            </form>
+        </div>
+
         <nav class="nav-links">
             <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
             <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
@@ -110,11 +118,10 @@
                         {{ post.autor.user.username|slice:":1"|upper }}
                     </div>
                     <div class="post-author-info">
-                        {# Futuramente, este será um link para o perfil do autor #}
                         <a href="{% url 'user_profile' username=post.autor.user.username %}" class="author-name">{{ post.autor.user.username }}</a>
                         <span class="post-timestamp">{{ post.criado_em|date:"d M, Y \à\s H:i" }}</span>
                     </div>
-                    {% if post.autor.user == user %} {# Verifica se o user logado é o autor do post #}
+                    {% if post.autor.user == user %}
                     <div class="post-options">
                         <button class="options-button" id="options-button-{{ post.id }}" onclick="event.stopPropagation(); toggleOptions({{ post.id }})">&#x22EE;</button>
                         <div class="options-dropdown" id="options-dropdown-{{ post.id }}">
@@ -145,10 +152,15 @@
                         <span class="like-count">{{ post.curtidas.count }} curtida{{ post.curtidas.count|pluralize:"s" }}</span>
                     </div>
                     <div class="action-item">
-                        <button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button>
+                        <button class="action-button"> {# Poderia ser um link para focar no campo de comentário #}
+                            <span class="icon">&#x1F4AC;</span>Comentar
+                        </button>
+                        {# <span class="comment-count">{{ post.comments.count }} comentário{{ post.comments.count|pluralize:"s" }}</span> #}
                     </div>
                     <div class="action-item">
-                        <button class="action-button"><span class="icon">&#x1F501;</span>Compartilhar</button>
+                        <button class="action-button">
+                            <span class="icon">&#x1F501;</span>Compartilhar
+                        </button>
                     </div>
                 </footer>
 
@@ -177,7 +189,6 @@
                                     {{ comment.autor.user.username|slice:":1"|upper }}
                                 </div>
                                 <div class="comment-content">
-                                    {# Futuramente, este será um link para o perfil do autor do comentário #}
                                     <a href="{% url 'user_profile' username=comment.autor.user.username %}" class="comment-author">{{ comment.autor.user.username }}</a>
                                     <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
                                     <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>

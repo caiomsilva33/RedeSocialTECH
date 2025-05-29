@@ -567,3 +567,111 @@ a:hover {
     border-top: 1px solid var(--cor-fundo-principal);
     background-color: var(--cor-fundo-elemento);
 }
+.header {
+    /* ... (estilos existentes do header) ... */
+    /* Ajuste o justify-content se necessário para acomodar a barra de pesquisa */
+    /* Ex: justify-content: space-between; ou use flex-grow nos elementos */
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    /* Adicione margens se necessário para espaçar da logo ou dos links */
+    /* Ex: margin: 0 20px; */
+    /* Para centralizar mais, você pode precisar ajustar o layout do .header */
+}
+
+.search-form {
+    display: flex;
+    background-color: var(--cor-fundo-input); /* Mesmo fundo dos inputs de formulário */
+    border-radius: 20px; /* Bordas bem arredondadas */
+    padding: 0px 5px 0px 10px; /* Padding interno (menor no lado do botão) */
+    border: 1px solid var(--cor-borda);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.search-form:focus-within { /* Estilo quando o formulário ou seus inputs estão em foco */
+    border-color: var(--cor-destaque);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+}
+
+.search-form input[type="text"] {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--cor-texto-principal);
+    padding: 8px 0px; /* Padding vertical para o input */
+    font-size: 0.9em;
+    width: 200px; /* Largura inicial, pode ajustar com media queries */
+}
+.search-form input[type="text"]::placeholder {
+    color: var(--cor-texto-secundario);
+}
+
+.search-button {
+    background: none;
+    border: none;
+    color: var(--cor-texto-secundario);
+    font-size: 1.1em; /* Tamanho do ícone da lupa */
+    padding: 8px 8px 8px 4px; /* Padding para o botão da lupa */
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+.search-button:hover {
+    color: var(--cor-destaque);
+}
+
+/* Ajuste para o layout do header com a pesquisa */
+.header {
+    display: flex;
+    justify-content: space-between; /* Garante que os itens se espalhem */
+    align-items: center;
+    padding: 0 20px;
+    height: 60px;
+}
+.header-brand {
+    flex-shrink: 0; /* Não encolhe a marca */
+}
+.search-container {
+    flex-grow: 1; /* Permite que a barra de pesquisa ocupe espaço */
+    display: flex;
+    justify-content: center; /* Centraliza o formulário dentro do container */
+    padding: 0 20px; /* Espaçamento lateral */
+}
+.search-container .search-form {
+    max-width: 400px; /* Limita a largura da barra de pesquisa */
+    width: 100%;
+}
+.nav-links {
+    flex-shrink: 0; /* Não encolhe os links de navegação */
+}
+
+.search-results-list {
+    margin-top: 20px;
+}
+
+.search-result-item { /* Se usar esta classe em vez de post-card */
+    background-color: var(--cor-fundo-elemento);
+    border-radius: var(--border-radius-padrao);
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: var(--box-shadow-padrao);
+}
+.search-result-item .post-card-header { /* Se estiver reutilizando */
+    border-bottom: 1px solid var(--cor-fundo-principal);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.profile-bio-search { /* Para a bio na lista de pesquisa */
+    font-size: 0.9em;
+    color: var(--cor-texto-secundario);
+    margin-top: 5px;
+}
+
+.no-results {
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    padding: 30px;
+    background-color: var(--cor-fundo-elemento);
+    border-radius: var(--border-radius-padrao);
+    margin-top: 20px;
+}

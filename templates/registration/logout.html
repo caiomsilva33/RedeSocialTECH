@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
 </head>
 <body>
-    {% comment %} Bloco de Mensagens do Django Adicionado Aqui {% endcomment %}
     {% if messages %}
         <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
             {% for message in messages %}
@@ -41,6 +40,12 @@
     <header class="header">
         <div class="header-brand">
             <a href="{% url 'feed' %}">RedeSocial Tech</a>
+        </div>
+        <div class="search-container">
+            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
+                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
+                <button type="submit" class="search-button">&#x1F50D;</button>
+            </form>
         </div>
         <nav class="nav-links">
             <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>

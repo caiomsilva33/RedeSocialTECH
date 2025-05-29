@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmar Exclusão | Rede Social Tech</title>
+    <title>Resultados da Pesquisa por "{{ query }}" | Rede Social Tech</title>
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
 </head>
 <body>
@@ -43,7 +43,7 @@
         </div>
         <div class="search-container">
             <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
-                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
+                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ query|default_if_none:'' }}">
                 <button type="submit" class="search-button">&#x1F50D;</button>
             </form>
         </div>
@@ -64,28 +64,40 @@
         </nav>
     </header>
 
-    <main class="main-container form-page-container">
-        <div class="simple-message-card">
-            <h2>Confirmar Exclusão</h2>
-            <p>Você tem certeza que deseja apagar o seguinte post?</p>
-            
-            <div style="background-color: var(--cor-fundo-input); padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid var(--cor-borda); text-align: left;">
-                <p><strong>Autor:</strong> {{ post.autor.user.username }}</p>
-                <p><strong>Texto:</strong></p>
-                <blockquote style="margin-left: 0; padding-left: 10px; border-left: 3px solid var(--cor-borda);">
-                    {{ post.texto|truncatewords_html:30|linebreaksbr }}
-                </blockquote>
-            </div>
+    <main class="main-container">
+        <h1 class="page-title">Resultados da Pesquisa por: "{{ query }}"</h1>
 
-            <form method="post" action="{% url 'apagar_post' post_id=post.id %}">
-                {% csrf_token %}
-                <div class="actions">
-                    <button type="submit" class="btn-submit btn-danger">Sim, Apagar</button>
-                    {# LINHA CORRIGIDA ABAIXO #}
-                    <a href="{% url 'feed' %}" class="btn-submit btn-secondary" style="text-decoration: none;">Cancelar</a>
-                </div>
-            </form>
-        </div>
+        {% if users_found %}
+            <div class="search-results-list">
+                {% for profile in users_found %}
+                    <div class="search-result-item post-card"> {# Reutilizando a classe post-card para um visual similar #}
+                        <div class="post-card-header"> {# Reutilizando para layout #}
+                            <div class="post-avatar-placeholder">
+                                {{ profile.user.username|slice:":1"|upper }}
+                            </div>
+                            <div class="post-author-info">
+                                <a href="{% url 'user_profile' username=profile.user.username %}" class="author-name">{{ profile.user.username }}</a>
+                                {% if profile.area_tecnologia %}
+                                    <span class="post-timestamp">{{ profile.area_tecnologia }}</span>
+                                {% endif %}
+                            </div>
+                            {# Você pode adicionar um botão de "Seguir" aqui no futuro #}
+                        </div>
+                        {% if profile.bio %}
+                        <div class="post-card-body">
+                             <p class="profile-bio-search">{{ profile.bio|truncatewords:20 }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% elif query %}
+            {# A mensagem de "nenhum usuário encontrado" já é enviada pela view via messages framework #}
+            {# Mas podemos ter um fallback aqui também se não quisermos depender só das messages #}
+            <p class="no-results">Nenhum usuário encontrado para a sua pesquisa.</p>
+        {% else %}
+            <p class="no-results">Por favor, digite um nome de usuário para pesquisar.</p>
+        {% endif %}
     </main>
 
     <footer class="footer">

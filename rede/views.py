@@ -12,6 +12,7 @@ from django.contrib import messages
 # Importe todos os formulários e modelos necessários
 from .forms import UserProfileForm, PostForm, RegistroForm, CommentForm
 from .models import Post, UserProfile, Comment
+from django.db.models import Q
 
 @login_required
 def feed(request):
@@ -194,3 +195,33 @@ def like_post_view(request, post_id):
         return HttpResponseRedirect(redirect_target_url)
     else:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('feed')))
+    
+@login_required # Ou remova se quiser que a pesquisa seja pública
+def user_search_results_view(request):
+    query = request.GET.get('q', '') # Pega o parâmetro 'q' da URL (termo de pesquisa)
+    users_found = [] # Lista para armazenar os UserProfiles encontrados
+
+    if query:
+        # Busca por UserProfiles cujo 'user__username' contém a query (ignorando maiúsculas/minúsculas)
+        # Você pode expandir para buscar em outros campos, como bio, area_tecnologia, etc.
+        # Usando Q objects para buscar em múltiplos campos (ex: username OU nome completo se tivesse)
+        # Por enquanto, vamos focar no username.
+        
+        # Busca usuários cujo username contém a query
+        # E garante que eles tenham um UserProfile associado (prática recomendada)
+        users_found = UserProfile.objects.filter(
+            user__username__icontains=query
+        ).select_related('user').order_by('user__username')
+        
+        if not users_found:
+            messages.info(request, f"Nenhum usuário encontrado para '{query}'.")
+    else:
+        # Se a query for vazia, não faz nada ou mostra uma mensagem
+        # messages.info(request, "Por favor, digite um termo para pesquisar.")
+        pass # Ou redireciona para algum lugar, ou simplesmente renderiza a página sem resultados
+
+    context = {
+        'query': query,
+        'users_found': users_found,
+    }
+    return render(request, 'rede/search_results.html', context)

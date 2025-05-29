@@ -41,6 +41,12 @@
         <div class="header-brand">
             <a href="{% url 'feed' %}">RedeSocial Tech</a>
         </div>
+        <div class="search-container">
+            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
+                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
+                <button type="submit" class="search-button">&#x1F50D;</button>
+            </form>
+        </div>
         <nav class="nav-links">
             <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
             <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
