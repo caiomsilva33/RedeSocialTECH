@@ -6,8 +6,6 @@ Bem-vindo à RedeSocialTECH! Este é um projeto de uma plataforma de rede social
 
 Esta aplicação permite que usuários se registrem, criem perfis, postem atualizações, comentem nas postagens de outros, curtam posts e visualizem perfis de outros membros da comunidade. O foco é criar um espaço para discussões e compartilhamento de conhecimento na área de tecnologia.
 
-*(Você pode personalizar esta descrição para melhor refletir seus objetivos com o projeto)*
-
 ## Funcionalidades Implementadas
 
 Com base no que desenvolvemos juntos:
@@ -35,8 +33,6 @@ Com base no que desenvolvemos juntos:
     * Design responsivo básico com tema escuro e cores personalizadas.
     * Feedback ao usuário através do sistema de mensagens do Django após ações.
     * Navegação padronizada entre as páginas.
-
-*(Revise esta lista e adicione ou remova funcionalidades conforme o estado atual do seu projeto.)*
 
 ## Tecnologias Utilizadas
 
