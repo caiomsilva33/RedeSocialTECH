@@ -1,4 +1,5 @@
 # Arquivo: redesocial/rede/views.py
+# Código completo e atualizado
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -8,8 +9,9 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
 
+# Importe todos os formulários e modelos necessários
 from .forms import UserProfileForm, PostForm, RegistroForm, CommentForm
-from .models import Post, UserProfile, Comment
+from .models import Post, UserProfile, Comment # UserProfile e User são cruciais aqui
 
 @login_required
 def feed(request):
@@ -68,7 +70,8 @@ def perfil(request):
 @login_required 
 def user_profile_view(request, username): 
     profile_owner_user = get_object_or_404(User, username=username)
-    user_profile_obj = get_object_or_404(UserProfile, user=profile_owner_user)
+    # Garante que o UserProfile exista para o usuário do perfil visualizado
+    user_profile_obj, created = UserProfile.objects.get_or_create(user=profile_owner_user)
     
     user_posts = Post.objects.filter(autor=user_profile_obj).order_by('-criado_em')
     comment_form_instance = CommentForm()
@@ -77,13 +80,22 @@ def user_profile_view(request, username):
     if is_own_profile:
         return redirect('meu_perfil')
 
+    # Verifica se o usuário logado já segue o perfil visualizado
+    is_following = False
+    if request.user.is_authenticated:
+        current_user_profile, chup_created = UserProfile.objects.get_or_create(user=request.user)
+        if user_profile_obj in current_user_profile.following.all():
+            is_following = True
+
     context = {
         'profile_user': user_profile_obj, 
         'posts': user_posts,
         'comment_form': comment_form_instance,
         'is_own_profile': is_own_profile, 
+        'is_following': is_following, # Passa o status de "seguindo" para o template
     }
     return render(request, 'rede/perfil.html', context)
+
 
 def registro(request):
     if request.user.is_authenticated:
@@ -92,6 +104,8 @@ def registro(request):
         form = RegistroForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # UserProfile será criado via get_or_create na primeira vez que 'perfil' ou uma ação que precise dele for chamada.
+            # Ou, se você tiver um signal post_save para User, ele seria criado lá.
             login(request, user)
             messages.success(request, f'Bem-vindo(a), {user.username}! Seu registro foi concluído com sucesso.')
             return redirect('feed')
@@ -184,22 +198,57 @@ def like_post_view(request, post_id):
     else:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('feed')))
 
-# View para resultados da pesquisa de usuários
 @login_required 
 def user_search_results_view(request):
     query = request.GET.get('q', '') 
     users_found = [] 
-
     if query:
         users_found = UserProfile.objects.filter(
             user__username__icontains=query
         ).select_related('user').order_by('user__username')
-        
         if not users_found:
             messages.info(request, f"Nenhum usuário encontrado para '{query}'.")
-    
     context = {
         'query': query,
         'users_found': users_found,
     }
     return render(request, 'rede/search_results.html', context)
+
+# --- NOVAS VIEWS PARA SEGUIR/DEIXAR DE SEGUIR ---
+@login_required
+def follow_user_view(request, username):
+    if request.method == 'POST':
+        user_to_follow = get_object_or_404(User, username=username)
+        current_user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        target_user_profile, created_target = UserProfile.objects.get_or_create(user=user_to_follow) # Garante que o perfil alvo exista
+
+        if user_to_follow == request.user:
+            messages.error(request, "Você não pode seguir a si mesmo.")
+        elif target_user_profile not in current_user_profile.following.all():
+            current_user_profile.following.add(target_user_profile)
+            messages.success(request, f"Você agora está seguindo {username}.")
+        else:
+            messages.info(request, f"Você já está seguindo {username}.")
+        return redirect('user_profile', username=username)
+    else:
+        # Requisições GET não são para esta ação
+        return redirect('user_profile', username=username) # Ou para o feed
+
+@login_required
+def unfollow_user_view(request, username):
+    if request.method == 'POST':
+        user_to_unfollow = get_object_or_404(User, username=username)
+        current_user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        target_user_profile, created_target = UserProfile.objects.get_or_create(user=user_to_unfollow)
+
+        if user_to_unfollow == request.user:
+            messages.error(request, "Você não pode deixar de seguir a si mesmo.")
+        elif target_user_profile in current_user_profile.following.all():
+            current_user_profile.following.remove(target_user_profile)
+            messages.success(request, f"Você deixou de seguir {username}.")
+        else:
+            messages.info(request, f"Você não estava seguindo {username}.")
+        return redirect('user_profile', username=username)
+    else:
+        # Requisições GET não são para esta ação
+        return redirect('user_profile', username=username) # Ou para o feed

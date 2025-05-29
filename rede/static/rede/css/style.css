@@ -675,3 +675,36 @@ a:hover {
     border-radius: var(--border-radius-padrao);
     margin-top: 20px;
 }
+
+.profile-header-card {
+    /* ... (estilos existentes) ... */
+    padding-bottom: 15px; /* Adiciona um pouco de espaço para os novos elementos */
+}
+
+.profile-stats {
+    margin-top: 15px;
+    color: var(--cor-texto-secundario);
+    font-size: 0.9em;
+}
+.profile-stats strong {
+    color: var(--cor-texto-principal);
+}
+
+.profile-actions {
+    margin-top: 20px;
+}
+.profile-actions .btn-submit {
+    padding: 8px 18px; /* Botões um pouco menores */
+    font-size: 0.95em;
+    width: auto; /* Para não ocupar 100% */
+    display: inline-block; /* Para permitir que fiquem na mesma linha se houver outros */
+}
+.profile-actions .btn-secondary { /* Para o botão "Deixar de Seguir" */
+    background-color: var(--cor-fundo-input); /* Cor mais neutra */
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto-secundario);
+}
+.profile-actions .btn-secondary:hover {
+    background-color: var(--cor-borda);
+    color: var(--cor-texto-principal);
+}

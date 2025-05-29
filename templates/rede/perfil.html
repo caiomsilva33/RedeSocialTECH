@@ -7,7 +7,6 @@
     <title>Perfil de {{ profile_user.user.username }} | Rede Social Tech</title>
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
     <script>
-        // JavaScript para toggleOptions (como antes)
         function toggleOptions(postId) {
             const dropdown = document.getElementById('options-dropdown-' + postId);
             if (dropdown) {
@@ -84,7 +83,6 @@
         <nav class="nav-links">
             <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
             <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
-            {# LINHA CORRIGIDA ABAIXO #}
             <a href="{% url 'meu_perfil' %}" {% if request.resolver_match.url_name == 'meu_perfil' %}class="active"{% endif %}>Meu Perfil</a>
             {% if user.is_authenticated %}
                 <span class="nav-user-info">Olá, {{ user.username }}</span>
@@ -107,6 +105,30 @@
             <h1 class="profile-username">{{ profile_user.user.username }}</h1>
             {% if profile_user.bio %}<p class="profile-bio">{{ profile_user.bio }}</p>{% endif %}
             {% if profile_user.area_tecnologia %}<p class="profile-tech-area">Área de Tecnologia: {{ profile_user.area_tecnologia }}</p>{% endif %}
+            
+            {# Contagem de Seguidores e Seguindo #}
+            <div class="profile-stats">
+                <span><strong>{{ profile_user.following.count }}</strong> seguindo</span>
+                <span style="margin: 0 10px;">|</span>
+                <span><strong>{{ profile_user.followers.count }}</strong> seguidores</span>
+            </div>
+
+            {# Botão de Seguir/Deixar de Seguir #}
+            {% if user.is_authenticated and not is_own_profile %} {# Só mostra se usuário logado e não for o próprio perfil #}
+                <div class="profile-actions">
+                    {% if is_following %}
+                        <form action="{% url 'unfollow_user' username=profile_user.user.username %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-submit btn-secondary">Deixar de Seguir</button>
+                        </form>
+                    {% else %}
+                        <form action="{% url 'follow_user' username=profile_user.user.username %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-submit btn-primary">Seguir</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
 
         {% if is_own_profile %}
