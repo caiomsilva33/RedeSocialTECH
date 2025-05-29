@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Exclusão | Rede Social Tech</title>
+    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-brand">
+            <a href="{% url 'feed' %}">RedeSocial Tech</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
+            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
+            <a href="{% url 'perfil' %}" {% if request.resolver_match.url_name == 'perfil' %}class="active"{% endif %}>Meu Perfil</a>
+            {% if user.is_authenticated %}
+                <span class="nav-user-info">Olá, {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
+                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="main-container form-page-container">
+        <div class="simple-message-card">
+            <h2>Confirmar Exclusão</h2>
+            <p>Você tem certeza que deseja apagar o seguinte post?</p>
+            
+            <div style="background-color: var(--cor-fundo-input); padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid var(--cor-borda); text-align: left;">
+                <p><strong>Autor:</strong> {{ post.autor.user.username }}</p>
+                <p><strong>Texto:</strong></p>
+                <blockquote style="margin-left: 0; padding-left: 10px; border-left: 3px solid var(--cor-borda);">
+                    {{ post.texto|truncatewords_html:30|linebreaksbr }}
+                </blockquote>
+            </div>
+
+            <form method="post" action="{% url 'apagar_post' post_id=post.id %}">
+                {% csrf_token %}
+                <div class="actions">
+                    <button type="submit" class="btn-submit btn-danger">Sim, Apagar</button>
+                    <a href="{% url 'feed' %}" class="btn-submit btn-secondary" style="text-decoration: none;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
+    </footer>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Post | Rede Social Tech</title>
+    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-brand">
+            <a href="{% url 'feed' %}">RedeSocial Tech</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
+            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
+            <a href="{% url 'perfil' %}" {% if request.resolver_match.url_name == 'perfil' %}class="active"{% endif %}>Meu Perfil</a>
+            {% if user.is_authenticated %}
+                <span class="nav-user-info">Olá, {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
+                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="main-container form-page-container">
+        <div class="form-card">
+            <h1 class="page-title">Criar Novo Post</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+                        {% if field.errors %}<ul class="errorlist">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+                {% endfor %}
+                 {% if form.non_field_errors %}<ul class="errorlist">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                <button type="submit" class="btn-submit">Postar</button>
+            </form>
+             <div class="link-text" style="margin-top: 15px;">
+                <a href="{% url 'feed' %}">Cancelar e Voltar para o Feed</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
+    </footer>
+</body>
+</html>

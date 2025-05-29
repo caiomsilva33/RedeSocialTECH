@@ -1,0 +1,495 @@
+/* static/rede/css/style.css */
+
+/* Reset básico e configurações globais */
+:root {
+    --cor-fundo-principal: #1a222c; /* Um tom escuro, ligeiramente diferente para variar */
+    --cor-fundo-elemento: #2c3e50; /* Cards, containers, header */
+    --cor-fundo-input: #253240;
+    --cor-texto-principal: #ecf0f1;
+    --cor-texto-secundario: #bdc3c7;
+    --cor-borda: #4a6c8e;
+    --cor-destaque: #3498db;
+    --cor-destaque-hover: #2980b9;
+    --cor-sucesso: #2ecc71;
+    --cor-sucesso-hover: #27ae60;
+    --cor-perigo: #e74c3c;
+    --cor-perigo-hover: #c0392b;
+    --cor-link: var(--cor-destaque);
+
+    --border-radius-padrao: 8px;
+    --box-shadow-padrao: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--cor-fundo-principal);
+    color: var(--cor-texto-principal);
+    margin: 0;
+    padding: 0;
+    padding-top: 70px; /* Espaço para a navbar fixa */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--cor-link);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+    color: var(--cor-destaque-hover);
+}
+
+/* --- Header / Navbar --- */
+.header {
+    width: 100%;
+    background-color: var(--cor-fundo-elemento);
+    padding: 0 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.header-brand a {
+    color: var(--cor-destaque);
+    font-size: 1.8em;
+    font-weight: bold;
+}
+.header-brand a:hover {
+    color: var(--cor-destaque-hover);
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+.nav-links a, .nav-links .nav-button-form button {
+    color: var(--cor-texto-principal);
+    padding: 8px 15px; /* Ajustado padding */
+    margin: 0 5px;
+    border-radius: var(--border-radius-padrao);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    border: none; /* Para o botão de logout */
+    background: none; /* Para o botão de logout */
+    cursor: pointer; /* Para o botão de logout */
+    font-family: inherit; /* Para o botão de logout */
+}
+.nav-links a:hover, .nav-links .nav-button-form button:hover {
+    background-color: var(--cor-borda);
+    text-decoration: none;
+}
+.nav-links a.active {
+    background-color: var(--cor-fundo-principal);
+    font-weight: bold;
+}
+.nav-button-form { display: inline; }
+.nav-user-info {
+    color: var(--cor-texto-secundario);
+    margin-right: 10px;
+    font-size: 0.9em;
+}
+
+/* --- Container Principal e Conteúdo --- */
+.main-container {
+    width: 90%;
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 0;
+    flex-grow: 1; /* Faz o conteúdo principal crescer para empurrar o footer para baixo */
+}
+.page-title {
+    color: var(--cor-destaque);
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 2em;
+}
+
+/* --- Caixa "Criar Novo Post" (Feed) --- */
+.create-post-box {
+    background-color: var(--cor-fundo-elemento);
+    padding: 20px;
+    border-radius: var(--border-radius-padrao);
+    margin-bottom: 25px;
+    box-shadow: var(--box-shadow-padrao);
+}
+.create-post-box textarea {
+    width: 100%;
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
+    padding: 12px;
+    min-height: 70px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 1em;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+.create-post-box textarea::placeholder { color: var(--cor-texto-secundario); }
+.create-post-box .btn-post {
+    background-color: var(--cor-destaque);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    float: right;
+}
+.create-post-box .btn-post:hover { background-color: var(--cor-destaque-hover); }
+.create-post-box::after { content: ""; clear: both; display: table; }
+
+/* --- Card de Post --- */
+.post-card {
+    background-color: var(--cor-fundo-elemento);
+    border-radius: var(--border-radius-padrao);
+    margin-bottom: 20px;
+    box-shadow: var(--box-shadow-padrao);
+    overflow: hidden;
+}
+.post-card-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--cor-fundo-principal);
+}
+.post-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: var(--cor-borda);
+    border-radius: 50%;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--cor-texto-principal);
+    font-size: 1.1em;
+}
+.post-author-info .author-name {
+    font-weight: 600;
+    color: var(--cor-texto-principal);
+}
+.post-author-info .post-timestamp {
+    font-size: 0.85em;
+    color: var(--cor-texto-secundario);
+}
+.post-options { margin-left: auto; position: relative; }
+.options-button {
+    background: none; border: none; color: var(--cor-texto-secundario);
+    font-size: 1.3em; cursor: pointer; padding: 5px;
+}
+.options-button:hover { color: var(--cor-texto-principal); }
+.options-dropdown {
+    display: none; position: absolute; right: 0; top: 100%;
+    background-color: var(--cor-fundo-input);
+    border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10; min-width: 120px; overflow: hidden;
+    border: 1px solid var(--cor-borda);
+}
+.options-dropdown a {
+    display: block; padding: 8px 12px; color: var(--cor-texto-principal);
+    font-size: 0.9em;
+}
+.options-dropdown a:hover { background-color: var(--cor-borda); text-decoration: none; }
+.options-dropdown a.delete-link { color: var(--cor-perigo); }
+.options-dropdown a.delete-link:hover { background-color: var(--cor-perigo); color: white; }
+.post-card-body {
+    padding: 16px; font-size: 1em; line-height: 1.6;
+    white-space: pre-wrap; word-wrap: break-word;
+    color: var(--cor-texto-principal);
+}
+.post-card-body p { margin: 0; }
+.post-card-actions {
+    padding: 8px 16px; border-top: 1px solid var(--cor-fundo-principal);
+    display: flex; gap: 15px;
+}
+.action-button {
+    background: none; border: none; color: var(--cor-texto-secundario);
+    cursor: pointer; font-size: 0.9em; padding: 6px 8px;
+    border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex; align-items: center;
+}
+.action-button:hover { background-color: var(--cor-borda); color: var(--cor-texto-principal); }
+.action-button .icon { margin-right: 6px; font-size: 1.2em; }
+.no-posts {
+    text-align: center; color: var(--cor-texto-secundario); padding: 40px 20px;
+    background-color: var(--cor-fundo-elemento); border-radius: var(--border-radius-padrao);
+}
+
+/* --- Formulários Genéricos --- */
+.form-page-container { /* Wrapper para páginas de formulário como login, registro, novo_post */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    padding: 20px;
+}
+.form-card {
+    background-color: var(--cor-fundo-elemento);
+    padding: 25px 30px;
+    border-radius: var(--border-radius-padrao);
+    box-shadow: var(--box-shadow-padrao);
+    width: 100%;
+    max-width: 450px; /* Largura para formulários de login/registro */
+}
+.form-card .page-title { /* Título dentro do card de formulário */
+    font-size: 1.8em;
+    margin-top: 0;
+}
+.form-group { margin-bottom: 18px; text-align: left; }
+.form-group label {
+    display: block; margin-bottom: 6px; font-weight: 500;
+    color: var(--cor-texto-secundario); font-size: 0.9em;
+}
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group textarea {
+    width: 100%; padding: 12px; box-sizing: border-box;
+    border-radius: 6px; border: 1px solid var(--cor-borda);
+    background-color: var(--cor-fundo-input); color: var(--cor-texto-principal);
+    font-family: inherit; font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-group textarea { min-height: 120px; resize: vertical; }
+.form-group input:focus, .form-group textarea:focus {
+    border-color: var(--cor-destaque); outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+}
+.form-group .help-text, .form-group ul.helptext { /* Django UserCreationForm usa ul.helptext */
+    font-size: 0.8em; color: var(--cor-texto-secundario);
+    margin-top: 5px; display: block;
+    list-style: none; padding-left: 0;
+}
+.form-group ul.helptext li { margin-bottom: 3px; }
+.errorlist {
+    color: var(--cor-perigo); list-style: none; padding: 0;
+    margin: 8px 0 0 0; font-size: 0.85em; text-align: left;
+}
+.form-group .errorlist li { margin-bottom: 3px; }
+
+.btn-submit, .btn-primary {
+    background-color: var(--cor-destaque); color: white;
+    padding: 12px 20px; border: none; border-radius: 6px;
+    cursor: pointer; font-size: 1.05em; font-weight: 500;
+    transition: background-color 0.3s ease; display: block; width: 100%;
+    margin-top: 20px; box-sizing: border-box;
+}
+.btn-submit:hover, .btn-primary:hover { background-color: var(--cor-destaque-hover); }
+
+.btn-danger { background-color: var(--cor-perigo); }
+.btn-danger:hover { background-color: var(--cor-perigo-hover); }
+.btn-secondary { background-color: var(--cor-texto-secundario); color: var(--cor-fundo-principal); }
+.btn-secondary:hover { background-color: #95a5a6; }
+
+.link-text { margin-top: 20px; font-size: 0.9em; text-align: center; }
+.link-text a { color: var(--cor-destaque); font-weight: 500; }
+
+/* --- Página de Perfil --- */
+.profile-header-card {
+    background-color: var(--cor-fundo-elemento);
+    border-radius: var(--border-radius-padrao);
+    margin-bottom: 25px;
+    box-shadow: var(--box-shadow-padrao);
+    padding: 25px;
+    text-align: center;
+}
+.profile-avatar-large {
+    width: 100px; height: 100px; background-color: var(--cor-borda);
+    border-radius: 50%; margin: 0 auto 15px auto;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: var(--cor-texto-principal); font-size: 2.5em;
+    border: 3px solid var(--cor-fundo-principal);
+}
+.profile-username {
+    font-size: 1.8em; font-weight: 600; color: var(--cor-texto-principal);
+    margin-bottom: 5px;
+}
+.profile-bio {
+    color: var(--cor-texto-secundario); margin-bottom: 10px; font-size: 0.95em;
+}
+.profile-tech-area {
+    color: var(--cor-destaque); font-size: 0.9em; font-weight: 500;
+}
+.profile-edit-form-section {
+    background-color: var(--cor-fundo-elemento);
+    padding: 20px;
+    border-radius: var(--border-radius-padrao);
+    margin-bottom: 25px;
+}
+.profile-edit-form-section h3 {
+    color: var(--cor-destaque); margin-top: 0; text-align: center;
+    border-bottom: 1px solid var(--cor-borda); padding-bottom: 10px; margin-bottom: 20px;
+}
+.user-posts-section h3 {
+    color: var(--cor-destaque); text-align: center;
+    border-bottom: 1px solid var(--cor-borda); padding-bottom: 10px; margin-bottom: 20px;
+}
+
+/* --- Páginas Simples (Logout, Confirmação) --- */
+.simple-message-card {
+    background-color: var(--cor-fundo-elemento);
+    padding: 30px 40px;
+    border-radius: var(--border-radius-padrao);
+    box-shadow: var(--box-shadow-padrao);
+    text-align: center;
+    max-width: 500px;
+    margin: 40px auto;
+}
+.simple-message-card h2 { color: var(--cor-destaque); margin-top: 0; }
+.simple-message-card p { color: var(--cor-texto-secundario); margin-bottom: 25px; }
+.simple-message-card .actions { margin-top: 20px; display: flex; justify-content: center; gap: 15px;}
+.simple-message-card .actions .btn-primary,
+.simple-message-card .actions .btn-secondary,
+.simple-message-card .actions .btn-danger {
+    width: auto; /* Não ocupar 100% */
+    padding: 10px 20px;
+}
+
+/* --- Footer --- */
+.footer {
+    margin-top: auto; /* Empurra para o final se o conteúdo for curto */
+    padding: 20px;
+    color: var(--cor-texto-secundario);
+    text-align: center;
+    font-size: 0.9em;
+    width: 100%;
+    background-color: var(--cor-fundo-elemento);
+    box-sizing: border-box;
+}
+
+.comments-section {
+    padding: 10px 16px 16px 16px; /* Padding interno, mas não no topo para conectar com actions */
+    border-top: 1px solid var(--cor-fundo-principal); /* Linha separadora sutil */
+    background-color: var(--cor-fundo-elemento); /* Mantém o fundo do card */
+}
+
+.add-comment-form {
+    margin-bottom: 20px;
+}
+
+.comment-input-group {
+    display: flex;
+    align-items: flex-start; /* Alinha o avatar e o textarea no topo */
+    gap: 10px;
+}
+
+.comment-avatar-placeholder { /* Estilo para o avatar ao lado do campo de comentário e nos comentários */
+    width: 32px; /* Menor que o avatar do post */
+    height: 32px;
+    font-size: 0.9em;
+    flex-shrink: 0; /* Impede que o avatar encolha */
+}
+
+.add-comment-form .comment-textarea { /* Usando a classe que definimos no widget do formulário */
+    flex-grow: 1; /* Faz o textarea ocupar o espaço disponível */
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto-principal);
+    border: 1px solid var(--cor-borda);
+    border-radius: 15px; /* Bordas mais arredondadas para um visual moderno */
+    padding: 8px 12px;
+    min-height: 38px; /* Altura para uma linha, permitindo expansão */
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.9em;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+.add-comment-form .comment-textarea::placeholder {
+    color: var(--cor-texto-secundario);
+}
+
+.btn-comment-submit {
+    background-color: var(--cor-destaque);
+    color: white;
+    border: none;
+    border-radius: 15px; /* Combinando com o textarea */
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+    height: 38px; /* Mesma altura do textarea de uma linha */
+    align-self: flex-end; /* Alinha com a base do textarea se o textarea crescer */
+}
+.btn-comment-submit:hover {
+    background-color: var(--cor-destaque-hover);
+}
+
+.comment-login-prompt {
+    font-size: 0.9em;
+    color: var(--cor-texto-secundario);
+    text-align: center;
+    padding: 10px 0;
+}
+
+.comments-list {
+    margin-top: 15px;
+}
+
+.comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+
+.comment-content {
+    background-color: var(--cor-fundo-input); /* Fundo levemente diferente para o balão do comentário */
+    padding: 8px 12px;
+    border-radius: 15px; /* Bordas arredondadas */
+    flex-grow: 1;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--cor-texto-principal);
+    margin-right: 6px;
+    font-size: 0.95em;
+}
+
+.comment-text {
+    margin: 2px 0 4px 0; /* Pequena margem para o texto */
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.comment-timestamp {
+    font-size: 0.8em;
+    color: var(--cor-texto-secundario);
+}
+
+.no-comments {
+    font-size: 0.85em;
+    color: var(--cor-texto-secundario);
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Ajustes no errorlist para o formulário de comentário se necessário */
+.add-comment-form .errorlist {
+    font-size: 0.8em;
+    color: var(--cor-perigo);
+    list-style: none;
+    padding-left: 0; /* Remove padding padrão da ul */
+    margin-top: 5px;
+    margin-left: 42px; /* Alinha com o campo de texto, após o avatar */
+}
