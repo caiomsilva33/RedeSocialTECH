@@ -8,51 +8,43 @@
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
 </head>
 <body>
-    <header class="header">
-        <div class="header-brand">
-            <a href="{% url 'feed' %}">RedeSocial Tech</a>
+    {% comment %} Bloco de Mensagens do Django Adicionado Aqui {% endcomment %}
+    {% if messages %}
+        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
+                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
+                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
+                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         </div>
-        <nav class="nav-links">
-            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
-            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
-            <a href="{% url 'perfil' %}" {% if request.resolver_match.url_name == 'perfil' %}class="active"{% endif %}>Meu Perfil</a>
-            {% if user.is_authenticated %}
-                <span class="nav-user-info">Olá, {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
-                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
-            {% endif %}
-        </nav>
-    </header>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                setTimeout(function() {
+                    let messagesContainer = document.querySelector('.messages-container');
+                    if (messagesContainer) {
+                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
+                        messagesContainer.style.opacity = '0';
+                        setTimeout(function() {
+                            messagesContainer.innerHTML = '';
+                            messagesContainer.remove();
+                        }, 700);
+                    }
+                }, 5000);
+            });
+        </script>
+    {% endif %}
+
+    <header class="header">
+     جوجل </header>
 
     <main class="main-container form-page-container">
-        <div class="form-card">
-            <h1 class="page-title">Criar Novo Post</h1>
-            <form method="post">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
-                        {% if field.errors %}<ul class="errorlist">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                    </div>
-                {% endfor %}
-                 {% if form.non_field_errors %}<ul class="errorlist">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                <button type="submit" class="btn-submit">Postar</button>
-            </form>
-             <div class="link-text" style="margin-top: 15px;">
-                <a href="{% url 'feed' %}">Cancelar e Voltar para o Feed</a>
-            </div>
-        </div>
     </main>
 
     <footer class="footer">
-        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
     </footer>
 </body>
 </html>

@@ -8,6 +8,36 @@
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
 </head>
 <body>
+    {% comment %} Bloco de Mensagens do Django Adicionado Aqui {% endcomment %}
+    {% if messages %}
+        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
+                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
+                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
+                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                setTimeout(function() {
+                    let messagesContainer = document.querySelector('.messages-container');
+                    if (messagesContainer) {
+                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
+                        messagesContainer.style.opacity = '0';
+                        setTimeout(function() {
+                            messagesContainer.innerHTML = '';
+                            messagesContainer.remove();
+                        }, 700);
+                    }
+                }, 5000);
+            });
+        </script>
+    {% endif %}
+
     <header class="header">
         <div class="header-brand">
             <a href="{% url 'feed' %}">RedeSocial Tech</a>
@@ -32,16 +62,20 @@
     <main class="main-container form-page-container">
         <div class="form-card">
             <h1 class="page-title">Login</h1>
-            {% if form.errors %}
-                <p class="errorlist" style="text-align: center; margin-bottom: 15px;">Seu nome de usuário e senha não correspondem. Tente novamente.</p>
+            
+            {% comment %} Mensagens de erro específicas do formulário de login são tratadas aqui também {% endcomment %}
+            {% if form.errors and not messages %} {# Mostra erros do formulário apenas se não houver mensagens do Django (para evitar duplicidade) #}
+                <div class="form-group">
+                    <ul class="errorlist">
+                        <li>Seu nome de usuário e senha não correspondem. Tente novamente.</li>
+                    </ul>
+                </div>
             {% endif %}
 
-            {% if next %}
-                {% if user.is_authenticated %}
-                    <p>Sua conta não tem acesso a esta página. Para prosseguir, por favor faça login com uma conta que tenha acesso.</p>
-                {% else %}
-                    <p>Por favor, faça login para ver esta página.</p>
-                {% endif %}
+            {% if next and not user.is_authenticated %}
+                <p style="text-align:center; color: var(--cor-texto-secundario); margin-bottom: 15px;">
+                    Por favor, faça login para ver esta página.
+                </p>
             {% endif %}
 
             <form method="post" action="{% url 'login' %}">
@@ -58,7 +92,7 @@
                 <input type="hidden" name="next" value="{{ next }}">
             </form>
             <div class="link-text">
-                <a href="#">Esqueceu a senha?</a> {# Placeholder #}
+                <a href="#">Esqueceu a senha?</a>
             </div>
             <div class="link-text" style="margin-top:10px;">
                 Não tem uma conta? <a href="{% url 'registro' %}">Crie uma agora</a>

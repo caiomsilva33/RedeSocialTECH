@@ -7,6 +7,7 @@
     <title>Feed | Rede Social Tech</title>
     <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
     <script>
+        // JavaScript para toggleOptions (sem alterações)
         function toggleOptions(postId) {
             const dropdown = document.getElementById('options-dropdown-' + postId);
             if (dropdown) {
@@ -41,6 +42,36 @@
     </script>
 </head>
 <body>
+    {% comment %} Bloco de Mensagens do Django Adicionado Aqui {% endcomment %}
+    {% if messages %}
+        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
+                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
+                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
+                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                setTimeout(function() {
+                    let messagesContainer = document.querySelector('.messages-container');
+                    if (messagesContainer) {
+                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
+                        messagesContainer.style.opacity = '0';
+                        setTimeout(function() {
+                            messagesContainer.innerHTML = '';
+                            messagesContainer.remove();
+                        }, 700);
+                    }
+                }, 5000);
+            });
+        </script>
+    {% endif %}
+
     <header class="header">
         <div class="header-brand">
             <a href="{% url 'feed' %}">RedeSocial Tech</a>
@@ -75,7 +106,7 @@
 
         {% if posts %}
             {% for post in posts %}
-            <article class="post-card" id="post-{{ post.id }}"> {# ID adicionado para a âncora #}
+            <article class="post-card" id="post-{{ post.id }}">
                 <header class="post-card-header">
                     <div class="post-avatar-placeholder">
                         {{ post.autor.user.username|slice:":1"|upper }}
@@ -101,7 +132,7 @@
                 </div>
                 <footer class="post-card-actions">
                     <button class="action-button"><span class="icon">&#x2764;&#xFE0F;</span>Curtir</button>
-                    <button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button> {# Este botão pode ser usado para mostrar/ocultar a seção de comentários no futuro #}
+                    <button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button>
                     <button class="action-button"><span class="icon">&#x1F501;</span>Compartilhar</button>
                 </footer>
 
@@ -110,11 +141,12 @@
                         {% if user.is_authenticated %}
                             <form method="post" action="{% url 'add_comment' post_id=post.id %}">
                                 {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                 <div class="comment-input-group">
                                     <div class="post-avatar-placeholder comment-avatar-placeholder">
                                         {{ user.username|slice:":1"|upper }}
                                     </div>
-                                    {{ comment_form.texto }} {# Renderiza o campo texto do CommentForm #}
+                                    {{ comment_form.texto }}
                                     <button type="submit" class="btn-comment-submit">Comentar</button>
                                 </div>
                                 {% if comment_form.texto.errors %}
@@ -124,12 +156,12 @@
                                 {% endif %}
                             </form>
                         {% else %}
-                            <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
+                            <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.get_full_path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
                         {% endif %}
                     </div>
 
                     <div class="comments-list">
-                        {% for comment in post.comments.all %} {# Acessando os comentários do post #}
+                        {% for comment in post.comments.all %}
                             <div class="comment">
                                 <div class="post-avatar-placeholder comment-avatar-placeholder">
                                     {{ comment.autor.user.username|slice:":1"|upper }}
@@ -139,14 +171,13 @@
                                     <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
                                     <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>
                                 </div>
-                                {# Adicionar opções de editar/apagar comentário para o autor do comentário no futuro #}
                             </div>
                         {% empty %}
                             <p class="no-comments">Nenhum comentário ainda. Seja o primeiro!</p>
                         {% endfor %}
                     </div>
                 </section>
-                </article>
+            </article>
             {% endfor %}
         {% else %}
             <div class="no-posts">
