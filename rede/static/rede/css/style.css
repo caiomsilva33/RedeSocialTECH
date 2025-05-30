@@ -1,710 +1,259 @@
-/* static/rede/css/style.css */
+/* static/rede/css/style.css - Versão Completa e Revisada */
 
-/* Reset básico e configurações globais */
+/* Definição das Variáveis de Cor para os Temas */
 :root {
-    --cor-fundo-principal: #1a222c; /* Um tom escuro, ligeiramente diferente para variar */
-    --cor-fundo-elemento: #2c3e50; /* Cards, containers, header */
-    --cor-fundo-input: #253240;
-    --cor-texto-principal: #ecf0f1;
-    --cor-texto-secundario: #bdc3c7;
-    --cor-borda: #4a6c8e;
-    --cor-destaque: #3498db;
-    --cor-destaque-hover: #2980b9;
-    --cor-sucesso: #2ecc71;
-    --cor-sucesso-hover: #27ae60;
-    --cor-perigo: #e74c3c;
-    --cor-perigo-hover: #c0392b;
-    --cor-link: var(--cor-destaque);
+    /* Paleta Light Mode - "Minimalista Moderno" (Padrão) */
+    --body-bg: #F4F6F8;
+    --element-bg: #FFFFFF;
+    --input-bg: #FFFFFF; 
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --border-color: #E5E7EB;
+    --accent-primary: #3B82F6; 
+    --accent-hover: #2563EB;
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --link-color: var(--accent-primary);
+    --button-text-color: white; /* Cor do texto para botões com fundo de destaque */
 
-    --border-radius-padrao: 8px;
-    --box-shadow-padrao: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --border-radius-padrao: 6px;
+    --box-shadow-padrao: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --box-shadow-strong: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --box-shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
+body.dark-mode {
+    /* Paleta Dark Mode - "Verde Matrix/Hacker" */
+    --body-bg: #0D1117;
+    --element-bg: #161B22;
+    --input-bg: #0D1117; 
+    --text-primary: #c9d1d9; 
+    --text-secondary: #8b949e;
+    --border-color: #30363D;
+    --accent-primary: #50FA7B; 
+    --accent-hover: #8AFF8A;
+    --color-success: #238636; 
+    --color-error: #f85149;   
+    --link-color: var(--accent-primary);
+    --button-text-color: #0D1117; /* Texto escuro para botões com fundo verde claro */
+    
+    --box-shadow-padrao: 0 1px 2px 0 rgba(0,0,0,0.1);
+    --box-shadow-strong: 0 4px 6px -1px rgba(0,0,0,0.2), 0 2px 4px -1px rgba(0,0,0,0.15);
+    --box-shadow-focus: 0 0 0 3px rgba(80, 250, 123, 0.25);
+}
+
+/* Estilos Base e Gerais */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--cor-fundo-principal);
-    color: var(--cor-texto-principal);
+    background-color: var(--body-bg);
+    color: var(--text-primary);
     margin: 0;
-    padding: 0;
-    padding-top: 70px; /* Espaço para a navbar fixa */
+    padding-top: 60px;
     line-height: 1.6;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    transition: background-color 0.2s ease-out, color 0.2s ease-out;
 }
-
-a {
-    color: var(--cor-link);
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
-    color: var(--cor-destaque-hover);
-}
-
-/* --- Header / Navbar --- */
-.header {
-    width: 100%;
-    background-color: var(--cor-fundo-elemento);
-    padding: 0 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 60px;
-    box-sizing: border-box;
-}
-
-.header-brand a {
-    color: var(--cor-destaque);
-    font-size: 1.8em;
-    font-weight: bold;
-}
-.header-brand a:hover {
-    color: var(--cor-destaque-hover);
-    text-decoration: none;
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-}
-.nav-links a, .nav-links .nav-button-form button {
-    color: var(--cor-texto-principal);
-    padding: 8px 15px; /* Ajustado padding */
-    margin: 0 5px;
-    border-radius: var(--border-radius-padrao);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-size: 0.95em;
-    display: flex;
-    align-items: center;
-    border: none; /* Para o botão de logout */
-    background: none; /* Para o botão de logout */
-    cursor: pointer; /* Para o botão de logout */
-    font-family: inherit; /* Para o botão de logout */
-}
-.nav-links a:hover, .nav-links .nav-button-form button:hover {
-    background-color: var(--cor-borda);
-    text-decoration: none;
-}
-.nav-links a.active {
-    background-color: var(--cor-fundo-principal);
-    font-weight: bold;
-}
-.nav-button-form { display: inline; }
-.nav-user-info {
-    color: var(--cor-texto-secundario);
-    margin-right: 10px;
-    font-size: 0.9em;
-}
-
-/* --- Container Principal e Conteúdo --- */
-.main-container {
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 0;
-    flex-grow: 1; /* Faz o conteúdo principal crescer para empurrar o footer para baixo */
-}
-.page-title {
-    color: var(--cor-destaque);
-    margin-bottom: 25px;
-    text-align: center;
-    font-size: 2em;
-}
-
-/* --- Caixa "Criar Novo Post" (Feed) --- */
-.create-post-box {
-    background-color: var(--cor-fundo-elemento);
-    padding: 20px;
-    border-radius: var(--border-radius-padrao);
-    margin-bottom: 25px;
-    box-shadow: var(--box-shadow-padrao);
-}
-.create-post-box textarea {
-    width: 100%;
-    background-color: var(--cor-fundo-input);
-    color: var(--cor-texto-principal);
-    border: 1px solid var(--cor-borda);
-    border-radius: 6px;
-    padding: 12px;
-    min-height: 70px;
-    resize: vertical;
-    font-family: inherit;
-    font-size: 1em;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-.create-post-box textarea::placeholder { color: var(--cor-texto-secundario); }
-.create-post-box .btn-post {
-    background-color: var(--cor-destaque);
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease;
-    float: right;
-}
-.create-post-box .btn-post:hover { background-color: var(--cor-destaque-hover); }
-.create-post-box::after { content: ""; clear: both; display: table; }
-
-/* --- Card de Post --- */
-.post-card {
-    background-color: var(--cor-fundo-elemento);
-    border-radius: var(--border-radius-padrao);
-    margin-bottom: 20px;
-    box-shadow: var(--box-shadow-padrao);
-    overflow: hidden;
-}
-.post-card-header {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--cor-fundo-principal);
-}
-.post-avatar-placeholder {
-    width: 40px;
-    height: 40px;
-    background-color: var(--cor-borda);
-    border-radius: 50%;
-    margin-right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: var(--cor-texto-principal);
-    font-size: 1.1em;
-}
-.post-author-info .author-name {
-    font-weight: 600;
-    color: var(--cor-texto-principal);
-}
-.post-author-info .post-timestamp {
-    font-size: 0.85em;
-    color: var(--cor-texto-secundario);
-}
-.post-options { margin-left: auto; position: relative; }
-.options-button {
-    background: none; border: none; color: var(--cor-texto-secundario);
-    font-size: 1.3em; cursor: pointer; padding: 5px;
-}
-.options-button:hover { color: var(--cor-texto-principal); }
-.options-dropdown {
-    display: none; position: absolute; right: 0; top: 100%;
-    background-color: var(--cor-fundo-input);
-    border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 10; min-width: 120px; overflow: hidden;
-    border: 1px solid var(--cor-borda);
-}
-.options-dropdown a {
-    display: block; padding: 8px 12px; color: var(--cor-texto-principal);
-    font-size: 0.9em;
-}
-.options-dropdown a:hover { background-color: var(--cor-borda); text-decoration: none; }
-.options-dropdown a.delete-link { color: var(--cor-perigo); }
-.options-dropdown a.delete-link:hover { background-color: var(--cor-perigo); color: white; }
-.post-card-body {
-    padding: 16px; font-size: 1em; line-height: 1.6;
-    white-space: pre-wrap; word-wrap: break-word;
-    color: var(--cor-texto-principal);
-}
-.post-card-body p { margin: 0; }
-.post-card-actions {
-    padding: 8px 16px; border-top: 1px solid var(--cor-fundo-principal);
-    display: flex; gap: 15px;
-}
-.action-button {
-    background: none; border: none; color: var(--cor-texto-secundario);
-    cursor: pointer; font-size: 0.9em; padding: 6px 8px;
-    border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease;
-    display: flex; align-items: center;
-}
-.action-button:hover { background-color: var(--cor-borda); color: var(--cor-texto-principal); }
-.action-button .icon { margin-right: 6px; font-size: 1.2em; }
-.no-posts {
-    text-align: center; color: var(--cor-texto-secundario); padding: 40px 20px;
-    background-color: var(--cor-fundo-elemento); border-radius: var(--border-radius-padrao);
-}
-
-/* --- Formulários Genéricos --- */
-.form-page-container { /* Wrapper para páginas de formulário como login, registro, novo_post */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    padding: 20px;
-}
-.form-card {
-    background-color: var(--cor-fundo-elemento);
-    padding: 25px 30px;
-    border-radius: var(--border-radius-padrao);
-    box-shadow: var(--box-shadow-padrao);
-    width: 100%;
-    max-width: 450px; /* Largura para formulários de login/registro */
-}
-.form-card .page-title { /* Título dentro do card de formulário */
-    font-size: 1.8em;
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; color: var(--accent-hover); }
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary); /* Garante que títulos também usem a cor do tema */
     margin-top: 0;
 }
-.form-group { margin-bottom: 18px; text-align: left; }
-.form-group label {
-    display: block; margin-bottom: 6px; font-weight: 500;
-    color: var(--cor-texto-secundario); font-size: 0.9em;
+
+/* Header, Pesquisa, Navegação */
+.header {
+    width: 100%; background-color: var(--element-bg); padding: 0 20px;
+    box-shadow: var(--box-shadow-padrao); position: fixed; top: 0; left: 0;
+    z-index: 1000; display: flex; justify-content: space-between;
+    align-items: center; height: 60px; box-sizing: border-box;
+    border-bottom: 1px solid var(--border-color);
 }
-.form-group input[type="text"],
-.form-group input[type="password"],
-.form-group input[type="email"],
-.form-group textarea {
-    width: 100%; padding: 12px; box-sizing: border-box;
-    border-radius: 6px; border: 1px solid var(--cor-borda);
-    background-color: var(--cor-fundo-input); color: var(--cor-texto-principal);
-    font-family: inherit; font-size: 1em;
+.header-brand a { color: var(--accent-primary); font-size: 1.7em; font-weight: 600; }
+.header-brand a:hover { color: var(--accent-hover); text-decoration: none; }
+.search-container { flex-grow: 1; display: flex; justify-content: center; padding: 0 15px; }
+.search-form {
+    display: flex; align-items: center; background-color: var(--input-bg);
+    border-radius: 20px; padding: 2px 5px 2px 12px; border: 1px solid var(--border-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; max-width: 450px; width: 100%;
+}
+.search-form:focus-within { border-color: var(--accent-primary); box-shadow: var(--box-shadow-focus); }
+.search-form input[type="text"] {
+    background: transparent; border: none; outline: none; color: var(--text-primary);
+    padding: 6px 0px; font-size: 0.9em; flex-grow: 1; width: calc(100% - 30px);
+}
+.search-form input[type="text"]::placeholder { color: var(--text-secondary); }
+.search-button { background: none; border: none; color: var(--text-secondary); font-size: 1.1em; padding: 6px; cursor: pointer; transition: color 0.2s ease; margin-left: 4px; }
+.search-button:hover { color: var(--accent-primary); }
+.nav-links { display: flex; align-items: center; flex-shrink: 0; }
+.nav-links a, .nav-links .nav-button-form button, .theme-toggle {
+    color: var(--text-secondary); padding: 8px 12px; margin: 0 3px;
+    border-radius: var(--border-radius-padrao); transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9em; display: flex; align-items: center; border: none;
+    background: none; cursor: pointer; font-family: inherit;
+}
+.nav-links a:hover, .nav-links .nav-button-form button:hover, .theme-toggle:hover { background-color: var(--input-bg); color: var(--text-primary); text-decoration: none; }
+.nav-links a.active { color: var(--accent-primary); font-weight: 600; background-color: transparent; }
+.theme-toggle { font-size: 1.2em; padding: 6px 10px; margin-left: 8px; }
+.nav-button-form { display: inline; }
+.nav-user-info { color: var(--text-secondary); margin-left: 8px; margin-right: 8px; font-size: 0.9em; }
+
+/* Layout de Colunas */
+.page-columns-wrapper { display: flex; max-width: 1280px; margin: 20px auto; gap: 20px; padding: 0 20px; box-sizing: border-box; width: 100%; flex-grow: 1; }
+.sidebar { background-color: var(--element-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-padrao); padding: 20px; box-shadow: var(--box-shadow-padrao); height: fit-content; flex-shrink: 0; }
+.left-sidebar { width: 250px; }
+.main-content-column { flex-grow: 1; min-width: 0; }
+.right-sidebar { width: 280px; }
+.sidebar-nav h4 { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-top: 0; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0 0 25px 0; }
+.sidebar-nav li a { display: flex; align-items: center; padding: 10px; color: var(--text-secondary); font-size: 0.95em; border-radius: 6px; transition: background-color 0.2s ease, color 0.2s ease; }
+.sidebar-nav li a:hover { background-color: var(--input-bg); color: var(--accent-primary); text-decoration: none;}
+.sidebar-nav li a .icon { margin-right: 12px; font-size: 1.2em; width: 20px; text-align: center; }
+.sidebar-profile-summary { margin-bottom: 20px; }
+.sidebar-profile-summary a { display: flex; align-items: center; padding: 10px; border-radius: 6px; transition: background-color 0.2s ease; }
+.sidebar-profile-summary a:hover { background-color: var(--input-bg); text-decoration: none; }
+.sidebar-avatar, .default-avatar-placeholder { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; margin-right: 10px; background-color: var(--border-color); color: var(--text-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid var(--border-color); }
+.default-avatar-placeholder { background-color: var(--input-bg); }
+.sidebar-username { color: var(--text-primary); font-weight: 500; }
+
+.page-title { color: var(--accent-primary); margin-bottom: 25px; text-align: center; font-size: 2em; }
+
+/* Caixa Criar Post, Card de Post, Formulários (form-card), etc. */
+.create-post-box, .post-card, .form-card, .simple-message-card, .profile-edit-form-section, .search-result-item, .no-posts, .no-results {
+    background-color: var(--element-bg); border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-padrao); box-shadow: var(--box-shadow-padrao); margin-bottom: 20px;
+}
+.create-post-box, .form-card, .simple-message-card, .profile-edit-form-section { padding: 25px; }
+.post-card { overflow: hidden; }
+.no-posts, .no-results { padding: 40px 20px; text-align: center; color: var(--text-secondary); }
+
+/* Estilos de Formulário (Inputs, Textareas) */
+input[type="text"], input[type="password"], input[type="email"], textarea, .form-control-file {
+    width: 100%; padding: 10px 12px; box-sizing: border-box; border-radius: 6px;
+    border: 1px solid var(--border-color); background-color: var(--input-bg);
+    color: var(--text-primary); font-family: inherit; font-size: 1em;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 5px; 
 }
-.form-group textarea { min-height: 120px; resize: vertical; }
-.form-group input:focus, .form-group textarea:focus {
-    border-color: var(--cor-destaque); outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+textarea { min-height: 70px; resize: vertical; }
+.comment-textarea { min-height: 40px; font-size: 0.9em; border-radius: 15px; }
+.create-post-textarea { min-height: 70px; }
+
+input[type="text"]::placeholder, textarea::placeholder { color: var(--text-secondary); }
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, textarea:focus {
+    border-color: var(--accent-primary); outline: none; box-shadow: var(--box-shadow-focus);
 }
-.form-group .help-text, .form-group ul.helptext { /* Django UserCreationForm usa ul.helptext */
-    font-size: 0.8em; color: var(--cor-texto-secundario);
-    margin-top: 5px; display: block;
-    list-style: none; padding-left: 0;
-}
+
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--text-secondary); font-size: 0.9em; }
+.form-group .help-text, .form-group ul.helptext { font-size: 0.8em; color: var(--text-secondary); margin-top: 4px; display: block; list-style: none; padding-left: 0; }
 .form-group ul.helptext li { margin-bottom: 3px; }
-.errorlist {
-    color: var(--cor-perigo); list-style: none; padding: 0;
-    margin: 8px 0 0 0; font-size: 0.85em; text-align: left;
-}
+.errorlist, .form-group .errorlist { color: var(--color-error); list-style: none; padding: 0; margin: 5px 0 0 0; font-size: 0.85em; text-align: left; }
 .form-group .errorlist li { margin-bottom: 3px; }
 
+.form-group .clearable-file-input { font-size: 0.9em; color: var(--text-secondary); }
+.form-group .clearable-file-input a { color: var(--link-color); word-break: break-all; }
+.form-group .clearable-file-input input[type="checkbox"] { width: auto; margin-right: 5px; vertical-align: middle; }
+.form-group .clearable-file-input label[for$="-clear"] { display: inline; font-weight: normal; color: var(--text-secondary); font-size: 1em; margin-left: 3px; }
+.form-group input[type="file"].form-control-file { padding: 8px; margin-top: 5px; }
+
+/* Botões */
 .btn-submit, .btn-primary {
-    background-color: var(--cor-destaque); color: white;
-    padding: 12px 20px; border: none; border-radius: 6px;
-    cursor: pointer; font-size: 1.05em; font-weight: 500;
-    transition: background-color 0.3s ease; display: block; width: 100%;
-    margin-top: 20px; box-sizing: border-box;
+    background-color: var(--accent-primary); color: var(--button-text-color); padding: 10px 20px;
+    border: none; border-radius: 6px; cursor: pointer; font-size: 1em;
+    font-weight: 500; transition: background-color 0.3s ease; display: block;
+    width: 100%; margin-top: 15px; box-sizing: border-box;
 }
-.btn-submit:hover, .btn-primary:hover { background-color: var(--cor-destaque-hover); }
+.btn-submit:hover, .btn-primary:hover { background-color: var(--accent-hover); }
 
-.btn-danger { background-color: var(--cor-perigo); }
-.btn-danger:hover { background-color: var(--cor-perigo-hover); }
-.btn-secondary { background-color: var(--cor-texto-secundario); color: var(--cor-fundo-principal); }
-.btn-secondary:hover { background-color: #95a5a6; }
-
-.link-text { margin-top: 20px; font-size: 0.9em; text-align: center; }
-.link-text a { color: var(--cor-destaque); font-weight: 500; }
-
-/* --- Página de Perfil --- */
-.profile-header-card {
-    background-color: var(--cor-fundo-elemento);
-    border-radius: var(--border-radius-padrao);
-    margin-bottom: 25px;
-    box-shadow: var(--box-shadow-padrao);
-    padding: 25px;
-    text-align: center;
-}
-.profile-avatar-large {
-    width: 100px; height: 100px; background-color: var(--cor-borda);
-    border-radius: 50%; margin: 0 auto 15px auto;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; color: var(--cor-texto-principal); font-size: 2.5em;
-    border: 3px solid var(--cor-fundo-principal);
-}
-.profile-username {
-    font-size: 1.8em; font-weight: 600; color: var(--cor-texto-principal);
-    margin-bottom: 5px;
-}
-.profile-bio {
-    color: var(--cor-texto-secundario); margin-bottom: 10px; font-size: 0.95em;
-}
-.profile-tech-area {
-    color: var(--cor-destaque); font-size: 0.9em; font-weight: 500;
-}
-.profile-edit-form-section {
-    background-color: var(--cor-fundo-elemento);
-    padding: 20px;
-    border-radius: var(--border-radius-padrao);
-    margin-bottom: 25px;
-}
-.profile-edit-form-section h3 {
-    color: var(--cor-destaque); margin-top: 0; text-align: center;
-    border-bottom: 1px solid var(--cor-borda); padding-bottom: 10px; margin-bottom: 20px;
-}
-.user-posts-section h3 {
-    color: var(--cor-destaque); text-align: center;
-    border-bottom: 1px solid var(--cor-borda); padding-bottom: 10px; margin-bottom: 20px;
-}
-
-/* --- Páginas Simples (Logout, Confirmação) --- */
-.simple-message-card {
-    background-color: var(--cor-fundo-elemento);
-    padding: 30px 40px;
-    border-radius: var(--border-radius-padrao);
-    box-shadow: var(--box-shadow-padrao);
-    text-align: center;
-    max-width: 500px;
-    margin: 40px auto;
-}
-.simple-message-card h2 { color: var(--cor-destaque); margin-top: 0; }
-.simple-message-card p { color: var(--cor-texto-secundario); margin-bottom: 25px; }
-.simple-message-card .actions { margin-top: 20px; display: flex; justify-content: center; gap: 15px;}
-.simple-message-card .actions .btn-primary,
-.simple-message-card .actions .btn-secondary,
-.simple-message-card .actions .btn-danger {
-    width: auto; /* Não ocupar 100% */
-    padding: 10px 20px;
-}
-
-/* --- Footer --- */
-.footer {
-    margin-top: auto; /* Empurra para o final se o conteúdo for curto */
-    padding: 20px;
-    color: var(--cor-texto-secundario);
-    text-align: center;
-    font-size: 0.9em;
-    width: 100%;
-    background-color: var(--cor-fundo-elemento);
-    box-sizing: border-box;
-}
-
-.comments-section {
-    padding: 10px 16px 16px 16px; /* Padding interno, mas não no topo para conectar com actions */
-    border-top: 1px solid var(--cor-fundo-principal); /* Linha separadora sutil */
-    background-color: var(--cor-fundo-elemento); /* Mantém o fundo do card */
-}
-
-.add-comment-form {
-    margin-bottom: 20px;
-}
-
-.comment-input-group {
-    display: flex;
-    align-items: flex-start; /* Alinha o avatar e o textarea no topo */
-    gap: 10px;
-}
-
-.comment-avatar-placeholder { /* Estilo para o avatar ao lado do campo de comentário e nos comentários */
-    width: 32px; /* Menor que o avatar do post */
-    height: 32px;
-    font-size: 0.9em;
-    flex-shrink: 0; /* Impede que o avatar encolha */
-}
-
-.add-comment-form .comment-textarea { /* Usando a classe que definimos no widget do formulário */
-    flex-grow: 1; /* Faz o textarea ocupar o espaço disponível */
-    background-color: var(--cor-fundo-input);
-    color: var(--cor-texto-principal);
-    border: 1px solid var(--cor-borda);
-    border-radius: 15px; /* Bordas mais arredondadas para um visual moderno */
-    padding: 8px 12px;
-    min-height: 38px; /* Altura para uma linha, permitindo expansão */
-    resize: vertical;
-    font-family: inherit;
-    font-size: 0.9em;
-    line-height: 1.4;
-    box-sizing: border-box;
-}
-.add-comment-form .comment-textarea::placeholder {
-    color: var(--cor-texto-secundario);
-}
-
-.btn-comment-submit {
-    background-color: var(--cor-destaque);
-    color: white;
-    border: none;
-    border-radius: 15px; /* Combinando com o textarea */
-    padding: 8px 15px;
-    cursor: pointer;
-    font-size: 0.9em;
+.create-post-box .btn-post, .btn-comment-submit {
+    background-color: var(--accent-primary); color: var(--button-text-color);
+    width: auto; padding: 8px 15px; font-size: 0.9em; margin-top: 0;
+    border: none; border-radius: 6px; cursor: pointer; font-weight: 500;
     transition: background-color 0.3s ease;
-    height: 38px; /* Mesma altura do textarea de uma linha */
-    align-self: flex-end; /* Alinha com a base do textarea se o textarea crescer */
 }
-.btn-comment-submit:hover {
-    background-color: var(--cor-destaque-hover);
-}
+.btn-comment-submit { height: 40px; align-self: center; border-radius: 15px;}
+.create-post-box .btn-post { float: right; }
 
-.comment-login-prompt {
-    font-size: 0.9em;
-    color: var(--cor-texto-secundario);
-    text-align: center;
-    padding: 10px 0;
+.btn-danger { background-color: var(--color-error); color:white; } /* Texto branco para erro */
+.btn-danger:hover { background-color: color-mix(in srgb, var(--color-error) 85%, black); }
+.btn-secondary {
+    background-color: var(--input-bg); color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
+.btn-secondary:hover { background-color: var(--border-color); color: var(--text-primary); }
+.link-text { margin-top: 20px; font-size: 0.9em; text-align: center; }
+.link-text a { color: var(--accent-primary); font-weight: 500; }
 
-.comments-list {
-    margin-top: 15px;
-}
+/* Card de Post Detalhes */
+.post-card-header { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+.post-avatar-placeholder { /* Já definido acima, apenas confirmando */ }
+.post-author-info .author-name { font-weight: 600; color: var(--text-primary); }
+.post-author-info .post-timestamp { font-size: 0.85em; color: var(--text-secondary); }
+.post-options { margin-left: auto; position: relative; }
+.options-button { background: none; border: none; color: var(--text-secondary); font-size: 1.3em; cursor: pointer; padding: 5px; }
+.options-button:hover { color: var(--text-primary); }
+.options-dropdown { display: none; position: absolute; right: 0; top: 100%; background-color: var(--element-bg); border-radius: 4px; box-shadow: var(--box-shadow-strong); z-index: 10; min-width: 120px; overflow: hidden; border: 1px solid var(--border-color); }
+.options-dropdown a { display: block; padding: 8px 12px; color: var(--text-primary); font-size: 0.9em; }
+.options-dropdown a:hover { background-color: var(--input-bg); text-decoration: none; }
+.options-dropdown a.delete-link { color: var(--color-error); }
+.options-dropdown a.delete-link:hover { background-color: var(--color-error); color: white; }
+.post-card-body { padding: 16px; font-size: 1em; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; color: var(--text-primary); }
+.post-card-body p { margin: 0 0 0.8em 0; color: var(--text-primary); font-size: 1em; line-height: 1.6; } /* Garantindo estilo para P dentro do post */
+.post-card-body p:last-child { margin-bottom: 0; }
+.post-card-actions { padding: 8px 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; }
+.action-item { display: flex; align-items: center; gap: 6px; }
+.like-form { display: inline-block; margin: 0; padding: 0; }
+.action-button { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.9em; padding: 6px 8px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; display: flex; align-items: center; font-family: inherit; }
+.action-button:hover { background-color: var(--input-bg); color: var(--text-primary); }
+.action-button .icon { margin-right: 6px; font-size: 1.2em; line-height: 1; }
+.action-button.liked-button .icon { color: var(--color-error); }
+.like-count, .comment-count { font-size: 0.85em; color: var(--text-secondary); margin-left: 4px; }
 
-.comment {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
+/* Seção de Comentários */
+.comments-section { padding: 10px 16px 16px 16px; border-top: 1px solid var(--border-color); }
+.add-comment-form { margin-bottom: 20px; }
+.comment-input-group { display: flex; align-items: center; gap: 10px; }
+.comment-login-prompt { font-size: 0.9em; color: var(--text-secondary); text-align: center; padding: 10px 0; }
+.comments-list { margin-top: 15px; }
+.comment { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 0.9em; }
+.comment-content { background-color: var(--input-bg); padding: 8px 12px; border-radius: 15px; flex-grow: 1; }
+.comment-author { font-weight: 600; color: var(--text-primary); font-size: 0.95em; margin-right: 6px; }
+.comment-text { margin: 2px 0 4px 0; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; color: var(--text-primary); } /* Garante cor do texto do comentário */
+.comment-timestamp { font-size: 0.8em; color: var(--text-secondary); }
+.no-comments { font-size: 0.85em; color: var(--text-secondary); text-align: center; padding: 10px 0; }
+.add-comment-form .errorlist { font-size: 0.8em; color: var(--color-error); list-style: none; padding-left: 0; margin-top: 5px; margin-left: 42px; }
 
-.comment-content {
-    background-color: var(--cor-fundo-input); /* Fundo levemente diferente para o balão do comentário */
-    padding: 8px 12px;
-    border-radius: 15px; /* Bordas arredondadas */
-    flex-grow: 1;
-}
+/* Perfil */
+.profile-cover-container { background-color: var(--input-bg); height: 280px; max-height: 35vh; border-radius: var(--border-radius-padrao) var(--border-radius-padrao) 0 0; overflow: hidden; position: relative; margin-bottom: -60px; border: 1px solid var(--border-color); }
+.profile-cover-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.profile-header-card { position: relative; padding-top: 70px; text-align: center; border-radius: 0 0 var(--border-radius-padrao) var(--border-radius-padrao); background-color: var(--element-bg); border: 1px solid var(--border-color); border-top: none; box-shadow: var(--box-shadow-padrao); margin-bottom: 20px; }
+.profile-avatar-large { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--element-bg); box-shadow: 0 3px 8px rgba(0,0,0,0.15); margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 3em; background-color: var(--input-bg); color: var(--text-primary); }
+.profile-avatar-large img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.current-avatar-preview-form { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 1px solid var(--border-color); display: block; margin-top:5px; }
+.form-group label[for$="-avatar"], .form-group label[for$="-cover_photo"] { margin-top: 15px; }
+.profile-username { font-size: 1.8em; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+.profile-bio { color: var(--text-secondary); margin-bottom: 10px; font-size: 0.95em; }
+.profile-tech-area { color: var(--accent-primary); font-size: 0.9em; font-weight: 500; }
+.profile-stats { margin-top: 15px; color: var(--text-secondary); font-size: 0.9em; }
+.profile-stats strong { color: var(--text-primary); }
+.profile-actions { margin-top: 20px; }
+.profile-actions .btn-submit { padding: 8px 18px; font-size: 0.95em; width: auto; display: inline-block; }
 
-.comment-author {
-    font-weight: 600;
-    color: var(--cor-texto-principal);
-    margin-right: 6px;
-    font-size: 0.95em;
-}
+/* Resultados da Pesquisa */
+.search-results-list { margin-top: 20px; }
+.profile-bio-search { font-size: 0.9em; color: var(--text-secondary); margin-top: 5px; }
 
-.comment-text {
-    margin: 2px 0 4px 0; /* Pequena margem para o texto */
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
+/* Mensagens Flutuantes */
+.messages-container { position: fixed; top: 75px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 90%; }
+.messages-container .alert { display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: var(--box-shadow-padrao); }
+body.dark-mode .messages-container .alert.alert-warning { color: var(--text-primary) !important; }
 
-.comment-timestamp {
-    font-size: 0.8em;
-    color: var(--cor-texto-secundario);
-}
+/* Footer */
+.footer { margin-top: auto; padding: 20px; color: var(--text-secondary); text-align: center; font-size: 0.9em; width: 100%; background-color: var(--element-bg); border-top: 1px solid var(--border-color); box-sizing: border-box; }
 
-.no-comments {
-    font-size: 0.85em;
-    color: var(--cor-texto-secundario);
-    text-align: center;
-    padding: 10px 0;
-}
-
-/* Ajustes no errorlist para o formulário de comentário se necessário */
-.add-comment-form .errorlist {
-    font-size: 0.8em;
-    color: var(--cor-perigo);
-    list-style: none;
-    padding-left: 0; /* Remove padding padrão da ul */
-    margin-top: 5px;
-    margin-left: 42px; /* Alinha com o campo de texto, após o avatar */
-}
-
-.post-card-actions {
-    padding: 8px 16px;
-    border-top: 1px solid var(--cor-fundo-principal);
-    display: flex;
-    justify-content: space-around; /* Para espaçar os itens de ação */
-    align-items: center;
-}
-
-.action-item {
-    display: flex;
-    align-items: center;
-    gap: 6px; /* Espaço entre o botão e a contagem, ou entre botões */
-}
-
-.like-form {
-    display: inline-block; /* Para que o formulário não quebre a linha e permita gap */
-    margin: 0; /* Reset de margem do formulário */
-    padding: 0; /* Reset de padding do formulário */
-}
-
-.action-button {
-    background: none;
-    border: none;
-    color: var(--cor-texto-secundario);
-    cursor: pointer;
-    font-size: 0.9em;
-    padding: 6px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    display: flex;
-    align-items: center;
-    font-family: inherit; /* Garante consistência da fonte */
-}
-.action-button:hover {
-    background-color: var(--cor-borda);
-    color: var(--cor-texto-principal);
-}
-.action-button .icon {
-    margin-right: 6px;
-    font-size: 1.2em;
-    line-height: 1; /* Para melhor alinhamento vertical do ícone */
-}
-
-/* Estilo específico para o botão quando o post está curtido */
-.action-button.liked-button .icon {
-    color: var(--cor-perigo); /* Coração vermelho quando curtido */
-}
-/* Se quiser que o texto "Descurtir" também fique vermelho: */
-.action-button.liked-button {
-     /* color: var(--cor-perigo); */ /* Descomente se quiser o texto vermelho */
-}
-.action-button.liked-button:hover {
-    /* background-color: rgba(231, 76, 60, 0.1); */ /* Exemplo de hover para botão curtido */
-    /* color: var(--cor-perigo-hover); */
-}
-
-.like-count, .comment-count {
-    font-size: 0.85em;
-    color: var(--cor-texto-secundario);
-    margin-left: 4px; /* Pequena margem se o contador estiver separado do botão */
-}
-
-/* Ajuste para .action-item se precisar de mais espaço ou alinhamento específico */
-.post-card-actions .action-item {
-    /* Exemplo: flex-grow: 1; text-align: center; */
-}
-
-/* --- Estilos para a Seção de Comentários (do Turno 32, para referência) --- */
-.comments-section {
-    padding: 10px 16px 16px 16px;
-    border-top: 1px solid var(--cor-fundo-principal);
-    background-color: var(--cor-fundo-elemento);
-}
-.header {
-    /* ... (estilos existentes do header) ... */
-    /* Ajuste o justify-content se necessário para acomodar a barra de pesquisa */
-    /* Ex: justify-content: space-between; ou use flex-grow nos elementos */
-}
-
-.search-container {
-    display: flex;
-    align-items: center;
-    /* Adicione margens se necessário para espaçar da logo ou dos links */
-    /* Ex: margin: 0 20px; */
-    /* Para centralizar mais, você pode precisar ajustar o layout do .header */
-}
-
-.search-form {
-    display: flex;
-    background-color: var(--cor-fundo-input); /* Mesmo fundo dos inputs de formulário */
-    border-radius: 20px; /* Bordas bem arredondadas */
-    padding: 0px 5px 0px 10px; /* Padding interno (menor no lado do botão) */
-    border: 1px solid var(--cor-borda);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.search-form:focus-within { /* Estilo quando o formulário ou seus inputs estão em foco */
-    border-color: var(--cor-destaque);
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
-}
-
-.search-form input[type="text"] {
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--cor-texto-principal);
-    padding: 8px 0px; /* Padding vertical para o input */
-    font-size: 0.9em;
-    width: 200px; /* Largura inicial, pode ajustar com media queries */
-}
-.search-form input[type="text"]::placeholder {
-    color: var(--cor-texto-secundario);
-}
-
-.search-button {
-    background: none;
-    border: none;
-    color: var(--cor-texto-secundario);
-    font-size: 1.1em; /* Tamanho do ícone da lupa */
-    padding: 8px 8px 8px 4px; /* Padding para o botão da lupa */
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-.search-button:hover {
-    color: var(--cor-destaque);
-}
-
-/* Ajuste para o layout do header com a pesquisa */
-.header {
-    display: flex;
-    justify-content: space-between; /* Garante que os itens se espalhem */
-    align-items: center;
-    padding: 0 20px;
-    height: 60px;
-}
-.header-brand {
-    flex-shrink: 0; /* Não encolhe a marca */
-}
-.search-container {
-    flex-grow: 1; /* Permite que a barra de pesquisa ocupe espaço */
-    display: flex;
-    justify-content: center; /* Centraliza o formulário dentro do container */
-    padding: 0 20px; /* Espaçamento lateral */
-}
-.search-container .search-form {
-    max-width: 400px; /* Limita a largura da barra de pesquisa */
-    width: 100%;
-}
-.nav-links {
-    flex-shrink: 0; /* Não encolhe os links de navegação */
-}
-
-.search-results-list {
-    margin-top: 20px;
-}
-
-.search-result-item { /* Se usar esta classe em vez de post-card */
-    background-color: var(--cor-fundo-elemento);
-    border-radius: var(--border-radius-padrao);
-    margin-bottom: 15px;
-    padding: 15px;
-    box-shadow: var(--box-shadow-padrao);
-}
-.search-result-item .post-card-header { /* Se estiver reutilizando */
-    border-bottom: 1px solid var(--cor-fundo-principal);
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-}
-.profile-bio-search { /* Para a bio na lista de pesquisa */
-    font-size: 0.9em;
-    color: var(--cor-texto-secundario);
-    margin-top: 5px;
-}
-
-.no-results {
-    text-align: center;
-    color: var(--cor-texto-secundario);
-    padding: 30px;
-    background-color: var(--cor-fundo-elemento);
-    border-radius: var(--border-radius-padrao);
-    margin-top: 20px;
-}
-
-.profile-header-card {
-    /* ... (estilos existentes) ... */
-    padding-bottom: 15px; /* Adiciona um pouco de espaço para os novos elementos */
-}
-
-.profile-stats {
-    margin-top: 15px;
-    color: var(--cor-texto-secundario);
-    font-size: 0.9em;
-}
-.profile-stats strong {
-    color: var(--cor-texto-principal);
-}
-
-.profile-actions {
-    margin-top: 20px;
-}
-.profile-actions .btn-submit {
-    padding: 8px 18px; /* Botões um pouco menores */
-    font-size: 0.95em;
-    width: auto; /* Para não ocupar 100% */
-    display: inline-block; /* Para permitir que fiquem na mesma linha se houver outros */
-}
-.profile-actions .btn-secondary { /* Para o botão "Deixar de Seguir" */
-    background-color: var(--cor-fundo-input); /* Cor mais neutra */
-    border: 1px solid var(--cor-borda);
-    color: var(--cor-texto-secundario);
-}
-.profile-actions .btn-secondary:hover {
-    background-color: var(--cor-borda);
-    color: var(--cor-texto-principal);
-}
+/* Media Queries */
+@media (max-width: 1100px) { .right-sidebar { display: none; } .page-columns-wrapper { justify-content: center; } }
+@media (max-width: 768px) { body { padding-top: 0; } .header { position: static; flex-direction: column; height: auto; padding-bottom: 10px; } .header-brand { margin-bottom: 10px; text-align: center; width: 100%;} .search-container { order: 2; width: 90%; padding: 0 0 10px 0; max-width: none; } .nav-links { order: 3; flex-wrap: wrap; justify-content: center; width:100%; } .nav-links a, .nav-links .nav-button-form button, .theme-toggle { margin-bottom: 5px; } .theme-toggle { margin-top: 0; margin-left:5px; } .page-columns-wrapper { flex-direction: column; margin-top: 10px; padding: 0 10px; gap: 15px; } .left-sidebar { order: 1; width: 100%; margin-bottom: 15px; } .main-content-column { max-width: 100%; order: 2; } .right-sidebar { order: 3; display: block; width: 100%; margin-bottom: 15px; } .messages-container { position: static; transform: none; width: 100%; max-width:100%; margin-bottom: 15px;} .messages-container .alert { display: block; width: auto; } }
+@media (max-width: 600px) { /* .left-sidebar { display: none; } */ }

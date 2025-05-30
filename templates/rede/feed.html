@@ -1,12 +1,11 @@
+{% extends "rede/base_colunas.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feed | Rede Social Tech</title>
-    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
+
+{% block title %}Feed | Rede Social Tech{% endblock title %}
+
+{% block extra_head %}
     <script>
+        // JavaScript para o dropdown de opções do post
         function toggleOptions(postId) {
             const dropdown = document.getElementById('options-dropdown-' + postId);
             if (dropdown) {
@@ -39,180 +38,126 @@
             }
         });
     </script>
-</head>
-<body>
-    {% if messages %}
-        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
-                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
-                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
-                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                setTimeout(function() {
-                    let messagesContainer = document.querySelector('.messages-container');
-                    if (messagesContainer) {
-                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
-                        messagesContainer.style.opacity = '0';
-                        setTimeout(function() {
-                            messagesContainer.innerHTML = '';
-                            messagesContainer.remove();
-                        }, 700);
-                    }
-                }, 5000);
-            });
-        </script>
+{% endblock extra_head %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <div class="create-post-box">
+        <form method="post" action="{% url 'novo_post' %}">
+            {% csrf_token %}
+            {# Adicionada a classe create-post-textarea e rows="3" #}
+            <textarea name="texto" class="form-control create-post-textarea" placeholder="O que você está pensando, {{ user.username }}?" required rows="3"></textarea>
+            <button type="submit" class="btn-submit btn-post">Postar</button>
+        </form>
+    </div>
     {% endif %}
 
-    <header class="header">
-        <div class="header-brand">
-            <a href="{% url 'feed' %}">RedeSocial Tech</a>
-        </div>
-
-        <div class="search-container">
-            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
-                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q }}">
-                <button type="submit" class="search-button">&#x1F50D;</button>
-            </form>
-        </div>
-
-        <nav class="nav-links">
-            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
-            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
-            <a href="{% url 'meu_perfil' %}" {% if request.resolver_match.url_name == 'meu_perfil' %}class="active"{% endif %}>Meu Perfil</a>
-            {% if user.is_authenticated %}
-                <span class="nav-user-info">Olá, {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
-                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
-            {% endif %}
-        </nav>
-    </header>
-
-    <main class="main-container">
-        {% if user.is_authenticated %}
-        <div class="create-post-box">
-            <form method="post" action="{% url 'novo_post' %}">
-                {% csrf_token %}
-                <textarea name="texto" placeholder="O que você está pensando, {{ user.username }}?" required></textarea>
-                <button type="submit" class="btn-post">Postar</button>
-            </form>
-        </div>
-        {% endif %}
-
-        {% if posts %}
-            {% for post in posts %}
-            <article class="post-card" id="post-{{ post.id }}">
-                <header class="post-card-header">
-                    <div class="post-avatar-placeholder">
-                        {{ post.autor.user.username|slice:":1"|upper }}
-                    </div>
-                    <div class="post-author-info">
-                        <a href="{% url 'user_profile' username=post.autor.user.username %}" class="author-name">{{ post.autor.user.username }}</a>
-                        <span class="post-timestamp">{{ post.criado_em|date:"d M, Y \à\s H:i" }}</span>
-                    </div>
-                    {% if post.autor.user == user %}
-                    <div class="post-options">
-                        <button class="options-button" id="options-button-{{ post.id }}" onclick="event.stopPropagation(); toggleOptions({{ post.id }})">&#x22EE;</button>
-                        <div class="options-dropdown" id="options-dropdown-{{ post.id }}">
-                            <a href="{% url 'editar_post' post_id=post.id %}">Editar</a>
-                            <a href="{% url 'apagar_post' post_id=post.id %}" class="delete-link">Apagar</a>
-                        </div>
-                    </div>
-                    {% endif %}
-                </header>
-                <div class="post-card-body">
-                    <p>{{ post.texto|linebreaksbr }}</p>
-                </div>
-                <footer class="post-card-actions">
-                    <div class="action-item">
-                        <form action="{% url 'like_post' post_id=post.id %}" method="POST" class="like-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.get_full_path }}#post-{{ post.id }}">
-                            {% if user in post.curtidas.all %}
-                                <button type="submit" class="action-button liked-button">
-                                    <span class="icon">&#x2764;&#xFE0F;</span> Descurtir
-                                </button>
-                            {% else %}
-                                <button type="submit" class="action-button">
-                                    <span class="icon">&#x1F90D;</span> Curtir
-                                </button>
-                            {% endif %}
-                        </form>
-                        <span class="like-count">{{ post.curtidas.count }} curtida{{ post.curtidas.count|pluralize:"s" }}</span>
-                    </div>
-                    <div class="action-item">
-                        <button class="action-button"> {# Poderia ser um link para focar no campo de comentário #}
-                            <span class="icon">&#x1F4AC;</span>Comentar
-                        </button>
-                        {# <span class="comment-count">{{ post.comments.count }} comentário{{ post.comments.count|pluralize:"s" }}</span> #}
-                    </div>
-                    <div class="action-item">
-                        <button class="action-button">
-                            <span class="icon">&#x1F501;</span>Compartilhar
-                        </button>
-                    </div>
-                </footer>
-
-                <section class="comments-section">
-                    <div class="add-comment-form">
-                        {% if user.is_authenticated %}
-                            <form method="post" action="{% url 'add_comment' post_id=post.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                <div class="comment-input-group">
-                                    <div class="post-avatar-placeholder comment-avatar-placeholder">
-                                        {{ user.username|slice:":1"|upper }}
-                                    </div>
-                                    {{ comment_form.texto }}
-                                    <button type="submit" class="btn-comment-submit">Comentar</button>
-                                </div>
-                            </form>
-                        {% else %}
-                            <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.get_full_path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
-                        {% endif %}
-                    </div>
-                    <div class="comments-list">
-                        {% for comment in post.comments.all %}
-                            <div class="comment">
-                                <div class="post-avatar-placeholder comment-avatar-placeholder">
-                                    {{ comment.autor.user.username|slice:":1"|upper }}
-                                </div>
-                                <div class="comment-content">
-                                    <a href="{% url 'user_profile' username=comment.autor.user.username %}" class="comment-author">{{ comment.autor.user.username }}</a>
-                                    <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
-                                    <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>
-                                </div>
-                            </div>
-                        {% empty %}
-                            <p class="no-comments">Nenhum comentário ainda. Seja o primeiro!</p>
-                        {% endfor %}
-                    </div>
-                </section>
-            </article>
-            {% endfor %}
-        {% else %}
-            <div class="no-posts">
-                <p>Nenhuma postagem ainda. Que tal criar a primeira?</p>
-                {% if not user.is_authenticated %}
-                    <p style="margin-top:10px;"><a href="{% url 'login' %}" class="btn-primary" style="display: inline-block; width: auto; padding: 10px 20px;">Faça Login</a> ou <a href="{% url 'registro' %}" class="btn-secondary" style="display: inline-block; width: auto; padding: 10px 20px; background-color: var(--cor-texto-secundario); color: var(--cor-fundo-principal);">Registre-se</a> para começar.</p>
+    {% if posts %}
+        {% for post in posts %}
+        <article class="post-card" id="post-{{ post.id }}">
+            <header class="post-card-header">
+                {% if post.autor.avatar and post.autor.avatar.url %}
+                    <img src="{{ post.autor.avatar.url }}" alt="Avatar de {{ post.autor.user.username }}" class="post-avatar-placeholder">
+                {% else %}
+                     <img src="{% static 'rede/images/default_avatar.png' %}" alt="Avatar padrão" class="post-avatar-placeholder">
                 {% endif %}
+                <div class="post-author-info">
+                    <a href="{% url 'user_profile' username=post.autor.user.username %}" class="author-name">{{ post.autor.user.username }}</a>
+                    <span class="post-timestamp">{{ post.criado_em|date:"d M, Y \à\s H:i" }}</span>
+                </div>
+                {% if post.autor.user == user %}
+                <div class="post-options">
+                    <button class="options-button" id="options-button-{{ post.id }}" onclick="event.stopPropagation(); toggleOptions({{ post.id }})">&#x22EE;</button>
+                    <div class="options-dropdown" id="options-dropdown-{{ post.id }}">
+                        <a href="{% url 'editar_post' post_id=post.id %}">Editar</a>
+                        <a href="{% url 'apagar_post' post_id=post.id %}" class="delete-link">Apagar</a>
+                    </div>
+                </div>
+                {% endif %}
+            </header>
+            <div class="post-card-body">
+                <p>{{ post.texto|linebreaksbr }}</p>
             </div>
-        {% endif %}
-    </main>
+            <footer class="post-card-actions">
+                <div class="action-item">
+                    <form action="{% url 'like_post' post_id=post.id %}" method="POST" class="like-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}#post-{{ post.id }}">
+                        {% if user in post.curtidas.all %}
+                            <button type="submit" class="action-button liked-button">
+                                <span class="icon">&#x2764;&#xFE0F;</span> Descurtir
+                            </button>
+                        {% else %}
+                            <button type="submit" class="action-button">
+                                <span class="icon">&#x1F90D;</span> Curtir
+                            </button>
+                        {% endif %}
+                    </form>
+                    <span class="like-count">{{ post.curtidas.count }} curtida{{ post.curtidas.count|pluralize:"s" }}</span>
+                </div>
+                <div class="action-item">
+                    <button class="action-button"> 
+                        <span class="icon">&#x1F4AC;</span>Comentar
+                    </button>
+                </div>
+                <div class="action-item">
+                    <button class="action-button">
+                        <span class="icon">&#x1F501;</span>Compartilhar
+                    </button>
+                </div>
+            </footer>
 
-    <footer class="footer">
-        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
-    </footer>
-</body>
-</html>
+            <section class="comments-section">
+                <div class="add-comment-form">
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'add_comment' post_id=post.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <div class="comment-input-group">
+                                {% if user.profile.avatar and user.profile.avatar.url %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="Seu avatar" class="post-avatar-placeholder comment-avatar-placeholder">
+                                {% else %}
+                                     <img src="{% static 'rede/images/default_avatar.png' %}" alt="Avatar padrão" class="post-avatar-placeholder comment-avatar-placeholder">
+                                {% endif %}
+                                {{ comment_form.texto }} {# Já tem a classe 'comment-textarea' via widget #}
+                                <button type="submit" class="btn-submit btn-comment-submit">Comentar</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.get_full_path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
+                    {% endif %}
+                </div>
+                <div class="comments-list">
+                    {% for comment in post.comments.all %}
+                        <div class="comment">
+                            {% if comment.autor.avatar and comment.autor.avatar.url %}
+                                <img src="{{ comment.autor.avatar.url }}" alt="Avatar de {{ comment.autor.user.username }}" class="post-avatar-placeholder comment-avatar-placeholder">
+                            {% else %}
+                                 <img src="{% static 'rede/images/default_avatar.png' %}" alt="Avatar padrão" class="post-avatar-placeholder comment-avatar-placeholder">
+                            {% endif %}
+                            <div class="comment-content">
+                                 <a href="{% url 'user_profile' username=comment.autor.user.username %}" class="comment-author">{{ comment.autor.user.username }}</a>
+                                <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
+                                <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="no-comments">Nenhum comentário ainda. Seja o primeiro!</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </article>
+        {% endfor %}
+    {% else %}
+        <div class="no-posts">
+            <p>Nenhuma postagem ainda. Que tal criar a primeira?</p>
+            {% if not user.is_authenticated %}
+                <p style="margin-top:10px;"><a href="{% url 'login' %}" class="btn-primary" style="display: inline-block; width: auto; padding: 10px 20px;">Faça Login</a> ou <a href="{% url 'registro' %}" class="btn-secondary" style="display: inline-block; width: auto; padding: 10px 20px;">Registre-se</a> para começar.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock content %}
+
+{% block left_sidebar %}
+    {{ block.super }}
+{% endblock left_sidebar %}

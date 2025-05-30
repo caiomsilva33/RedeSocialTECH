@@ -1,94 +1,39 @@
+{% extends "rede/base_colunas.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Post | Rede Social Tech</title>
-    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
-</head>
-<body>
-    {% if messages %}
-        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
-                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
-                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
-                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
-                    {{ message }}
+
+{% block title %}Editar Post | Rede Social Tech{% endblock title %}
+
+{% block extra_head %}
+    {# Nenhum CSS ou JS extra específico para o <head> desta página por enquanto #}
+{% endblock extra_head %}
+
+{% block content %}
+    <div class="form-card"> {# Reutilizando a classe para o card do formulário #}
+        <h1 class="page-title">Editar Post</h1>
+        <form method="post" action="{% url 'editar_post' post_id=post.id %}">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+                    {% if field.errors %}<ul class="errorlist">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
                 </div>
             {% endfor %}
+            {% if form.non_field_errors %}<ul class="errorlist">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            <button type="submit" class="btn-submit btn-primary">Salvar Alterações</button>
+        </form>
+        <div class="link-text" style="margin-top: 15px;">
+            {# Link "Cancelar" simplificado para voltar ao feed #}
+            <a href="{% url 'feed' %}#post-{{post.id}}">Cancelar e Voltar</a>
         </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                setTimeout(function() {
-                    let messagesContainer = document.querySelector('.messages-container');
-                    if (messagesContainer) {
-                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
-                        messagesContainer.style.opacity = '0';
-                        setTimeout(function() {
-                            messagesContainer.innerHTML = '';
-                            messagesContainer.remove();
-                        }, 700);
-                    }
-                }, 5000);
-            });
-        </script>
-    {% endif %}
+    </div>
+{% endblock content %}
 
-    <header class="header">
-        <div class="header-brand">
-            <a href="{% url 'feed' %}">RedeSocial Tech</a>
-        </div>
-        <div class="search-container">
-            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
-                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
-                <button type="submit" class="search-button">&#x1F50D;</button>
-            </form>
-        </div>
-        <nav class="nav-links">
-            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
-            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
-            <a href="{% url 'meu_perfil' %}" {% if request.resolver_match.url_name == 'meu_perfil' %}class="active"{% endif %}>Meu Perfil</a>
-            {% if user.is_authenticated %}
-                <span class="nav-user-info">Olá, {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
-                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
-            {% endif %}
-        </nav>
-    </header>
+{% block left_sidebar %}
+    {{ block.super }} {# Herda a sidebar esquerda padrão do base_colunas.html #}
+{% endblock left_sidebar %}
 
-    <main class="main-container form-page-container">
-        <div class="form-card">
-            <h1 class="page-title">Editar Post</h1>
-            <form method="post" action="{% url 'editar_post' post_id=post.id %}">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
-                        {{ field }}
-                        {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
-                        {% if field.errors %}<ul class="errorlist">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                    </div>
-                {% endfor %}
-                {% if form.non_field_errors %}<ul class="errorlist">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                <button type="submit" class="btn-submit btn-primary">Salvar Alterações</button>
-            </form>
-            <div class="link-text" style="margin-top: 15px;">
-                {# Link "Cancelar" simplificado #}
-                <a href="{% url 'feed' %}">Cancelar e Voltar para o Feed</a>
-            </div>
-        </div>
-    </main>
-
-    <footer class="footer">
-        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
-    </footer>
-</body>
-</html>
+{% block extra_scripts %}
+    {# Nenhum JS extra específico para o final do <body> desta página por enquanto #}
+{% endblock extra_scripts %}

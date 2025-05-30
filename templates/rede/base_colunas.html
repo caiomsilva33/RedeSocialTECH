@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Rede Social Tech{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
+    {% block extra_head %}{% endblock extra_head %}
+</head>
+<body {% if request.COOKIES.theme == 'dark' %}class="dark-mode"{% endif %}> {# Tenta aplicar o tema dark se um cookie 'theme' existir #}
+    {% if messages %}
+        <div class="messages-container"> {# Estilos para este container devem estar no style.css #}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <header class="header">
+        <div class="header-brand">
+            <a href="{% url 'feed' %}">RedeSocial Tech</a>
+        </div>
+        <div class="search-container">
+            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
+                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
+                <button type="submit" class="search-button">&#x1F50D;</button>
+            </form>
+        </div>
+        <nav class="nav-links">
+            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
+            {% if user.is_authenticated %} {# Só mostra Novo Post e Meu Perfil se logado #}
+            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
+            <a href="{% url 'meu_perfil' %}" {% if request.resolver_match.url_name == 'meu_perfil' %}class="active"{% endif %}>Meu Perfil</a>
+            {% endif %}
+            <button id="theme-toggle-button" class="action-button theme-toggle" title="Mudar tema">🌓</button>
+            {% if user.is_authenticated %}
+                <span class="nav-user-info">Olá, {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
+                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="page-columns-wrapper">
+        <aside class="sidebar left-sidebar">
+            {% block left_sidebar %}
+                <nav class="sidebar-nav">
+                    {% if user.is_authenticated %}
+                    <div class="sidebar-profile-summary">
+                        <a href="{% url 'meu_perfil' %}">
+                            {% if user.profile.avatar and user.profile.avatar.url %}
+                                <img src="{{ user.profile.avatar.url }}" alt="Seu avatar" class="sidebar-avatar">
+                            {% elif user.profile.avatar_url_display %} {# Se você tiver uma propriedade no modelo #}
+                                <img src="{{ user.profile.avatar_url_display }}" alt="Seu avatar" class="sidebar-avatar">
+                            {% else %}
+                                <div class="sidebar-avatar default-avatar-placeholder">{{ user.username|slice:":1"|upper }}</div>
+                            {% endif %}
+                            <span class="sidebar-username">{{ user.username }}</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                    <h4>Navegação</h4>
+                    <ul>
+                        <li><a href="{% url 'feed' %}"><span class="icon">&#128240;</span> Feed</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'meu_perfil' %}"><span class="icon">&#128100;</span> Meu Perfil</a></li>
+                        <li><a href="#"><span class="icon">&#128233;</span> Mensagens</a></li> {# Placeholder #}
+                        <li><a href="#"><span class="icon">&#128276;</span> Notificações</a></li> {# Placeholder #}
+                        {% endif %}
+                    </ul>
+                    <h4>Descobrir</h4>
+                    <ul>
+                        <li><a href="#"><span class="icon">&#128101;</span> Grupos</a></li> {# Placeholder #}
+                        <li><a href="#"><span class="icon">&#128197;</span> Eventos</a></li> {# Placeholder #}
+                    </ul>
+                </nav>
+            {% endblock left_sidebar %}
+        </aside>
+
+        <main class="main-content-column">
+            {% block content %}
+            {# O conteúdo principal da página específica virá aqui #}
+            {% endblock content %}
+        </main>
+
+        <aside class="sidebar right-sidebar">
+            {% block right_sidebar %}
+                <h4>Novidades</h4>
+                <p style="font-size:0.9em; color:var(--text-secondary);">
+                    Bem-vindo à RedeSocialTECH! Estamos trabalhando em novas funcionalidades.
+                </p>
+                
+                <h4 style="margin-top:20px;">Sugestões</h4>
+                <p style="font-size:0.9em; color:var(--text-secondary);">(Em breve)</p>
+            {% endblock right_sidebar %}
+        </aside>
+    </div>
+
+    <footer class="footer">
+        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Script para esconder mensagens do Django
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer && messagesContainer.children.length > 0) { // Verifica se há mensagens
+                setTimeout(function() {
+                    if (messagesContainer) { // Verifica novamente se ainda existe
+                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
+                        messagesContainer.style.opacity = '0';
+                        setTimeout(function() {
+                            if (messagesContainer) messagesContainer.innerHTML = ''; // Limpa as mensagens
+                        }, 700); // Tempo para a animação de fade out
+                    }
+                }, 5000); // 5 segundos para desaparecer
+            } else if (messagesContainer) {
+                messagesContainer.style.display = 'none'; // Esconde o container se não houver mensagens
+            }
+
+
+            // Script para alternar tema (Light/Dark)
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const body = document.body;
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+            function applyTheme(theme, fromUserAction = false) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-mode');
+                    if (themeToggleButton) themeToggleButton.textContent = '☀️';
+                    if (fromUserAction) localStorage.setItem('theme', 'dark');
+                     // document.cookie = "theme=dark;path=/;max-age=" + (60*60*24*365) + ";samesite=Lax";
+                } else {
+                    body.classList.remove('dark-mode');
+                    if (themeToggleButton) themeToggleButton.textContent = '🌓';
+                    if (fromUserAction) localStorage.setItem('theme', 'light');
+                    // document.cookie = "theme=light;path=/;max-age=" + (60*60*24*365) + ";samesite=Lax";
+                }
+            }
+            
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Aplica tema inicial
+            // Prioridade: localStorage > Cookie > Preferência do Sistema > Padrão (Light)
+            let initialTheme = localStorage.getItem('theme');
+            if (!initialTheme) {
+                initialTheme = getCookie('theme');
+            }
+
+            if (initialTheme) {
+                applyTheme(initialTheme);
+            } else if (prefersDarkScheme.matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light'); 
+            }
+
+            if (themeToggleButton) {
+                themeToggleButton.addEventListener('click', () => {
+                    let newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                    applyTheme(newTheme, true); // true indica que foi uma ação do usuário para salvar no localStorage
+                });
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock extra_scripts %}
+</body>
+</html>

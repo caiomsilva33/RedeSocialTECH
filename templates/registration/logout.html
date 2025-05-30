@@ -1,74 +1,28 @@
+{% extends "rede/base_colunas.html" %} {# Ou "base_colunas.html" se estiver na pasta raiz de templates #}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logout | Rede Social Tech</title>
-    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
-</head>
-<body>
-    {% if messages %}
-        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
-                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
-                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
-                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                setTimeout(function() {
-                    let messagesContainer = document.querySelector('.messages-container');
-                    if (messagesContainer) {
-                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
-                        messagesContainer.style.opacity = '0';
-                        setTimeout(function() {
-                            messagesContainer.innerHTML = '';
-                            messagesContainer.remove();
-                        }, 700);
-                    }
-                }, 5000);
-            });
-        </script>
-    {% endif %}
 
-    <header class="header">
-        <div class="header-brand">
-            <a href="{% url 'feed' %}">RedeSocial Tech</a>
-        </div>
-        <div class="search-container">
-            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
-                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
-                <button type="submit" class="search-button">&#x1F50D;</button>
-            </form>
-        </div>
-        <nav class="nav-links">
-            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
-            <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
-            <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
-        </nav>
-    </header>
+{% block title %}Logout Efetuado | Rede Social Tech{% endblock title %}
 
-    <main class="main-container form-page-container">
-        <div class="simple-message-card">
-            <h2>Você foi desconectado!</h2>
-            <p>Agradecemos sua visita. Esperamos vê-lo novamente em breve.</p>
-            <div class="actions">
-                <a href="{% url 'login' %}" class="btn-submit btn-primary">Fazer Login Novamente</a>
-            </div>
-             <div class="link-text" style="margin-top: 15px;">
-                <a href="{% url 'feed' %}">Voltar para o Feed</a>
-            </div>
-        </div>
-    </main>
+{% block extra_head %}
+    {# Nenhum CSS ou JS extra específico para o <head> desta página por enquanto #}
+{% endblock extra_head %}
 
-    <footer class="footer">
-        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
-    </footer>
-</body>
-</html>
+{% block content %}
+    <div class="simple-message-card"> {# Reutilizando a classe para o card de mensagem simples #}
+        <h2 class="page-title">Você foi desconectado!</h2>
+        <p>Agradecemos sua visita. Esperamos vê-lo novamente em breve.</p>
+        <div class="actions" style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <a href="{% url 'login' %}" class="btn-submit btn-primary" style="width: auto; padding: 10px 20px;">Fazer Login Novamente</a>
+            <a href="{% url 'feed' %}" class="link-text" style="margin-top: 10px;">Voltar para o Feed</a>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block left_sidebar %}
+    {# Para páginas como esta, geralmente não exibimos a sidebar de navegação. #}
+    {# Deixe vazio para remover a sidebar esquerda padrão nesta página. #}
+{% endblock left_sidebar %}
+
+{% block extra_scripts %}
+    {# Nenhum JS extra específico para o final do <body> desta página por enquanto #}
+{% endblock extra_scripts %}

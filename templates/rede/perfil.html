@@ -1,12 +1,39 @@
+{% extends "rede/base_colunas.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de {{ profile_user.user.username }} | Rede Social Tech</title>
-    <link rel="stylesheet" href="{% static 'rede/css/style.css' %}">
+
+{% block title %}Perfil de {{ profile_user.user.username }} | Rede Social Tech{% endblock title %}
+
+{% block extra_head %}
+    {# Estilo específico para preview do avatar no formulário de edição #}
+    <style>
+        .current-avatar-preview-form { /* Nome da classe mais específico */
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            margin-top: 5px;
+            display: block;
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+        }
+        .form-group label[for$="-avatar"],
+        .form-group label[for$="-cover_photo"] {
+            margin-top: 15px; 
+        }
+        /* Tentar esconder o "Currently: <filename>" e o label "Clear" do widget do Django */
+        /* Isso é experimental e pode não funcionar em todas as versões/browsers ou pode ser frágil */
+        .form-group .clearable-file-input a { /* Esconde o link do arquivo atual */
+            /* display: none !important; */
+        }
+        .form-group .clearable-file-input label[for$="-clear"] { /* Esconde o label "Clear" */
+            /* display: none !important; */
+        }
+         /* Esconde o texto "Currently:" que o Django insere. Precisa inspecionar o HTML gerado para pegar o seletor certo. */
+        /* Geralmente é texto antes da tag <a> do nome do arquivo. */
+
+    </style>
     <script>
+        // JavaScript para o dropdown de opções do post
         function toggleOptions(postId) {
             const dropdown = document.getElementById('options-dropdown-' + postId);
             if (dropdown) {
@@ -18,6 +45,8 @@
                 dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
             }
         }
+        // Este event listener é melhor no base_colunas.html se o dropdown for usado em múltiplas páginas
+        // Mas se for só para posts na página de perfil, pode ficar aqui.
         document.addEventListener('click', function(event) {
             const openDropdowns = document.querySelectorAll('.options-dropdown');
             let clickedInsideOptions = false;
@@ -39,223 +68,176 @@
             }
         });
     </script>
-</head>
-<body>
-    {% if messages %}
-        <div class="messages-container" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; width: auto; max-width: 80%; text-align: center;">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" style="display: inline-block; padding: 10px 20px; margin-bottom: 10px; border-radius: 6px; color: white; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                    {% if message.tags == 'success' %}background-color: var(--cor-sucesso);{% endif %}
-                    {% if message.tags == 'error' %}background-color: var(--cor-perigo);{% endif %}
-                    {% if message.tags == 'info' %}background-color: var(--cor-destaque);{% endif %}
-                    {% if message.tags == 'warning' %}background-color: #f39c12; color: #333;{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+{% endblock extra_head %}
+
+
+{% block content %}
+    <div class="profile-cover-container">
+        {% if profile_user.cover_photo and profile_user.cover_photo.url %}
+            <img src="{{ profile_user.cover_photo.url }}" alt="Foto de capa de {{ profile_user.user.username }}" class="profile-cover-photo">
+        {% else %}
+            {# Você pode colocar uma cor de fundo ou uma imagem de placeholder aqui via CSS se preferir #}
+            <img src="{% static 'rede/images/default_cover.png' %}" alt="Capa padrão" class="profile-cover-photo">
+        {% endif %}
+    </div>
+
+    <div class="profile-header-card"> {# Este card agora fica abaixo da capa #}
+        {% if profile_user.avatar and profile_user.avatar.url %}
+            <img src="{{ profile_user.avatar.url }}" alt="Avatar de {{ profile_user.user.username }}" class="profile-avatar-large">
+        {% else %}
+             <img src="{% static 'rede/images/default_avatar.png' %}" alt="Avatar padrão" class="profile-avatar-large">
+        {% endif %}
+        <h1 class="profile-username">{{ profile_user.user.username }}</h1>
+        {% if profile_user.bio %}<p class="profile-bio">{{ profile_user.bio }}</p>{% endif %}
+        {% if profile_user.area_tecnologia %}<p class="profile-tech-area">Área de Tecnologia: {{ profile_user.area_tecnologia }}</p>{% endif %}
+        
+        <div class="profile-stats">
+            <span><strong>{{ profile_user.following.count }}</strong> seguindo</span>
+            <span style="margin: 0 10px;">|</span>
+            <span><strong>{{ profile_user.followers.count }}</strong> seguidores</span>
         </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                setTimeout(function() {
-                    let messagesContainer = document.querySelector('.messages-container');
-                    if (messagesContainer) {
-                        messagesContainer.style.transition = 'opacity 0.7s ease-out';
-                        messagesContainer.style.opacity = '0';
-                        setTimeout(function() {
-                            messagesContainer.innerHTML = '';
-                            messagesContainer.remove();
-                        }, 700);
-                    }
-                }, 5000);
-            });
-        </script>
+
+        {% if user.is_authenticated and not is_own_profile %}
+            <div class="profile-actions">
+                {% if is_following %}
+                    <form action="{% url 'unfollow_user' username=profile_user.user.username %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-submit btn-secondary">Deixar de Seguir</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'follow_user' username=profile_user.user.username %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-submit btn-primary">Seguir</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if is_own_profile %}
+    <section class="profile-edit-form-section form-card">
+        <h3>Editar Meu Perfil</h3>
+        <form method="post" action="{% url 'meu_perfil' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ profile_edit_form.cover_photo.id_for_label }}">{{ profile_edit_form.cover_photo.label }}</label>
+                {% if profile_user.cover_photo and profile_user.cover_photo.url %}
+                     <img src="{{ profile_user.cover_photo.url }}" alt="Capa atual" style="max-width:100%; height:auto; max-height:100px; border-radius:4px; margin-bottom:10px; display:block; border:1px solid var(--border-color);">
+                {% endif %}
+                {{ profile_edit_form.cover_photo }}
+                {% if profile_edit_form.cover_photo.help_text %}<small class="help-text">{{ profile_edit_form.cover_photo.help_text }}</small>{% endif %}
+                {% if profile_edit_form.cover_photo.errors %}<ul class="errorlist">{% for error in profile_edit_form.cover_photo.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ profile_edit_form.avatar.id_for_label }}">{{ profile_edit_form.avatar.label }}</label>
+                {# Preview do avatar atual ANTES do input de arquivo #}
+                {% if profile_user.avatar and profile_user.avatar.url %}
+                    <img src="{{ profile_user.avatar.url }}" alt="Avatar atual" class="current-avatar-preview-form">
+                {% endif %}
+                {{ profile_edit_form.avatar }} {# Widget ClearableFileInput do Django #}
+                {% if profile_edit_form.avatar.help_text %}<small class="help-text">{{ profile_edit_form.avatar.help_text }}</small>{% endif %}
+                {% if profile_edit_form.avatar.errors %}<ul class="errorlist">{% for error in profile_edit_form.avatar.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ profile_edit_form.bio.id_for_label }}">{{ profile_edit_form.bio.label }}</label>
+                {{ profile_edit_form.bio }}
+                {% if profile_edit_form.bio.errors %}<ul class="errorlist">{% for error in profile_edit_form.bio.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ profile_edit_form.area_tecnologia.id_for_label }}">{{ profile_edit_form.area_tecnologia.label }}</label>
+                {{ profile_edit_form.area_tecnologia }}
+                {% if profile_edit_form.area_tecnologia.errors %}<ul class="errorlist">{% for error in profile_edit_form.area_tecnologia.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+            <button type="submit" class="btn-submit" name="update_profile_submit">Salvar Alterações</button>
+        </form>
+    </section>
     {% endif %}
 
-    <header class="header">
-        <div class="header-brand">
-            <a href="{% url 'feed' %}">RedeSocial Tech</a>
-        </div>
-        <div class="search-container">
-            <form method="GET" action="{% url 'user_search_results' %}" class="search-form">
-                <input type="text" name="q" placeholder="Pesquisar usuários..." value="{{ request.GET.q|default_if_none:'' }}">
-                <button type="submit" class="search-button">&#x1F50D;</button>
-            </form>
-        </div>
-        <nav class="nav-links">
-            <a href="{% url 'feed' %}" {% if request.resolver_match.url_name == 'feed' %}class="active"{% endif %}>Feed</a>
-            <a href="{% url 'novo_post' %}" {% if request.resolver_match.url_name == 'novo_post' %}class="active"{% endif %}>Novo Post</a>
-            <a href="{% url 'meu_perfil' %}" {% if request.resolver_match.url_name == 'meu_perfil' %}class="active"{% endif %}>Meu Perfil</a>
-            {% if user.is_authenticated %}
-                <span class="nav-user-info">Olá, {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post" class="nav-button-form">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}class="active"{% endif %}>Login</a>
-                <a href="{% url 'registro' %}" {% if request.resolver_match.url_name == 'registro' %}class="active"{% endif %}>Registrar</a>
-            {% endif %}
-        </nav>
-    </header>
-
-    <main class="main-container">
-        <div class="profile-header-card">
-            <div class="profile-avatar-large">
-                {{ profile_user.user.username|slice:":1"|upper }}
-            </div>
-            <h1 class="profile-username">{{ profile_user.user.username }}</h1>
-            {% if profile_user.bio %}<p class="profile-bio">{{ profile_user.bio }}</p>{% endif %}
-            {% if profile_user.area_tecnologia %}<p class="profile-tech-area">Área de Tecnologia: {{ profile_user.area_tecnologia }}</p>{% endif %}
-            
-            {# Contagem de Seguidores e Seguindo #}
-            <div class="profile-stats">
-                <span><strong>{{ profile_user.following.count }}</strong> seguindo</span>
-                <span style="margin: 0 10px;">|</span>
-                <span><strong>{{ profile_user.followers.count }}</strong> seguidores</span>
-            </div>
-
-            {# Botão de Seguir/Deixar de Seguir #}
-            {% if user.is_authenticated and not is_own_profile %} {# Só mostra se usuário logado e não for o próprio perfil #}
-                <div class="profile-actions">
-                    {% if is_following %}
-                        <form action="{% url 'unfollow_user' username=profile_user.user.username %}" method="POST" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-submit btn-secondary">Deixar de Seguir</button>
-                        </form>
-                    {% else %}
-                        <form action="{% url 'follow_user' username=profile_user.user.username %}" method="POST" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-submit btn-primary">Seguir</button>
-                        </form>
-                    {% endif %}
-                </div>
-            {% endif %}
-        </div>
-
-        {% if is_own_profile %}
-        <section class="profile-edit-form-section form-card">
-            <h3>Editar Meu Perfil</h3>
-            <form method="post" action="{% url 'meu_perfil' %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="{{ profile_edit_form.bio.id_for_label }}">{{ profile_edit_form.bio.label }}</label>
-                    {{ profile_edit_form.bio }}
-                    {% if profile_edit_form.bio.errors %}<ul class="errorlist">{% for error in profile_edit_form.bio.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ profile_edit_form.area_tecnologia.id_for_label }}">{{ profile_edit_form.area_tecnologia.label }}</label>
-                    {{ profile_edit_form.area_tecnologia }}
-                    {% if profile_edit_form.area_tecnologia.errors %}<ul class="errorlist">{% for error in profile_edit_form.area_tecnologia.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                </div>
-                <button type="submit" class="btn-submit" name="update_profile_submit">Salvar Alterações</button>
-            </form>
-        </section>
-        {% endif %}
-
-        <section class="user-posts-section">
-            <h3>Posts de {{ profile_user.user.username }}</h3>
-            {% if posts %}
-                {% for post in posts %}
-                    <article class="post-card" id="post-{{ post.id }}">
-                        <header class="post-card-header">
-                            <div class="post-avatar-placeholder">
-                                {{ post.autor.user.username|slice:":1"|upper }}
-                            </div>
-                            <div class="post-author-info">
-                                {% if post.autor.user.username == profile_user.user.username %}
-                                    <span class="author-name">{{ post.autor.user.username }}</span>
-                                {% else %}
-                                    <a href="{% url 'user_profile' username=post.autor.user.username %}" class="author-name">{{ post.autor.user.username }}</a>
-                                {% endif %}
-                                <span class="post-timestamp">{{ post.criado_em|date:"d M, Y \à\s H:i" }}</span>
-                            </div>
-                            {% if post.autor.user == user %}
-                            <div class="post-options">
-                                <button class="options-button" id="options-button-{{ post.id }}" onclick="event.stopPropagation(); toggleOptions({{ post.id }})">&#x22EE;</button>
-                                <div class="options-dropdown" id="options-dropdown-{{ post.id }}">
-                                    <a href="{% url 'editar_post' post_id=post.id %}">Editar</a>
-                                    <a href="{% url 'apagar_post' post_id=post.id %}" class="delete-link">Apagar</a>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </header>
-                        <div class="post-card-body">
-                            <p>{{ post.texto|linebreaksbr }}</p>
-                        </div>
-                        <footer class="post-card-actions">
-                            <div class="action-item">
-                                <form action="{% url 'like_post' post_id=post.id %}" method="POST" class="like-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.get_full_path }}#post-{{ post.id }}">
-                                    {% if user in post.curtidas.all %}
-                                        <button type="submit" class="action-button liked-button">
-                                            <span class="icon">&#x2764;&#xFE0F;</span> Descurtir
-                                        </button>
-                                    {% else %}
-                                        <button type="submit" class="action-button">
-                                            <span class="icon">&#x1F90D;</span> Curtir
-                                        </button>
-                                    {% endif %}
-                                </form>
-                                <span class="like-count">{{ post.curtidas.count }} curtida{{ post.curtidas.count|pluralize:"s" }}</span>
-                            </div>
-                            <div class="action-item">
-                                <button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button>
-                            </div>
-                            <div class="action-item">
-                                <button class="action-button"><span class="icon">&#x1F501;</span>Compartilhar</button>
-                            </div>
-                        </footer>
-                        <section class="comments-section">
-                            <div class="add-comment-form">
-                                {% if user.is_authenticated %}
-                                    <form method="post" action="{% url 'add_comment' post_id=post.id %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                        <div class="comment-input-group">
-                                            <div class="post-avatar-placeholder comment-avatar-placeholder">
-                                                {{ user.username|slice:":1"|upper }}
-                                            </div>
-                                            {{ comment_form.texto }}
-                                            <button type="submit" class="btn-comment-submit">Comentar</button>
-                                        </div>
-                                    </form>
-                                {% else %}
-                                    <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.get_full_path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
-                                {% endif %}
-                            </div>
-                            <div class="comments-list">
-                                {% for comment in post.comments.all %}
-                                    <div class="comment">
-                                        <div class="post-avatar-placeholder comment-avatar-placeholder">
-                                            {{ comment.autor.user.username|slice:":1"|upper }}
-                                        </div>
-                                        <div class="comment-content">
-                                             <a href="{% url 'user_profile' username=comment.autor.user.username %}" class="comment-author">{{ comment.autor.user.username }}</a>
-                                            <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
-                                            <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>
-                                        </div>
-                                    </div>
-                                {% empty %}
-                                    <p class="no-comments">Nenhum comentário ainda. Seja o primeiro!</p>
-                                {% endfor %}
-                            </div>
-                        </section>
-                    </article>
-                {% endfor %}
-            {% else %}
-                <p class="no-posts">
-                    {% if is_own_profile %}
-                        Você ainda não fez nenhuma postagem.
-                    {% else %}
-                        {{ profile_user.user.username }} ainda não fez nenhuma postagem.
-                    {% endif %}
-                </p>
-            {% endif %}
-        </section>
-    </main>
-
-    <footer class="footer">
-        &copy; {% now "Y" %} Rede Social Tech. Todos os direitos reservados.
-    </footer>
-</body>
-</html>
+    <section class="user-posts-section">
+      <h3>Posts de {{ profile_user.user.username }}</h3>
+      {% if posts %}
+          {% for post in posts %}
+              {# ... Estrutura do post-card como antes, usando avatares ... #}
+              <article class="post-card" id="post-{{ post.id }}">
+                  <header class="post-card-header">
+                      {% if post.autor.avatar and post.autor.avatar.url %}
+                          <img src="{{ post.autor.avatar.url }}" alt="Avatar de {{ post.autor.user.username }}" class="post-avatar-placeholder">
+                      {% else %}
+                          <div class="post-avatar-placeholder">{{ post.autor.user.username|slice:":1"|upper }}</div>
+                      {% endif %}
+                      <div class="post-author-info">
+                          {% if post.autor.user.username == profile_user.user.username %}
+                              <span class="author-name">{{ post.autor.user.username }}</span>
+                          {% else %}
+                              <a href="{% url 'user_profile' username=post.autor.user.username %}" class="author-name">{{ post.autor.user.username }}</a>
+                          {% endif %}
+                          <span class="post-timestamp">{{ post.criado_em|date:"d M, Y \à\s H:i" }}</span>
+                      </div>
+                      {% if post.autor.user == user %}
+                      <div class="post-options">
+                          <button class="options-button" id="options-button-{{ post.id }}" onclick="event.stopPropagation(); toggleOptions({{ post.id }})">&#x22EE;</button>
+                          <div class="options-dropdown" id="options-dropdown-{{ post.id }}">
+                              <a href="{% url 'editar_post' post_id=post.id %}">Editar</a>
+                              <a href="{% url 'apagar_post' post_id=post.id %}" class="delete-link">Apagar</a>
+                          </div>
+                      </div>
+                      {% endif %}
+                  </header>
+                  <div class="post-card-body"><p>{{ post.texto|linebreaksbr }}</p></div>
+                  <footer class="post-card-actions">
+                      <div class="action-item">
+                          <form action="{% url 'like_post' post_id=post.id %}" method="POST" class="like-form">
+                              {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}#post-{{ post.id }}">
+                              {% if user in post.curtidas.all %}<button type="submit" class="action-button liked-button"><span class="icon">&#x2764;&#xFE0F;</span> Descurtir</button>
+                              {% else %}<button type="submit" class="action-button"><span class="icon">&#x1F90D;</span> Curtir</button>{% endif %}
+                          </form>
+                          <span class="like-count">{{ post.curtidas.count }} curtida{{ post.curtidas.count|pluralize:"s" }}</span>
+                      </div>
+                      <div class="action-item"><button class="action-button"><span class="icon">&#x1F4AC;</span>Comentar</button></div>
+                      <div class="action-item"><button class="action-button"><span class="icon">&#x1F501;</span>Compartilhar</button></div>
+                  </footer>
+                  <section class="comments-section">
+                      <div class="add-comment-form">
+                          {% if user.is_authenticated %}
+                              <form method="post" action="{% url 'add_comment' post_id=post.id %}">
+                                  {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                  <div class="comment-input-group">
+                                      {% if user.profile.avatar and user.profile.avatar.url %}<img src="{{ user.profile.avatar.url }}" alt="Seu avatar" class="post-avatar-placeholder comment-avatar-placeholder">
+                                      {% else %}<div class="post-avatar-placeholder comment-avatar-placeholder">{{ user.username|slice:":1"|upper }}</div>{% endif %}
+                                      {{ comment_form.texto }}
+                                      <button type="submit" class="btn-comment-submit">Comentar</button>
+                                  </div>
+                              </form>
+                          {% else %}
+                              <p class="comment-login-prompt"><a href="{% url 'login' %}?next={{ request.get_full_path }}#post-{{post.id}}">Faça login</a> para comentar.</p>
+                          {% endif %}
+                      </div>
+                      <div class="comments-list">
+                          {% for comment in post.comments.all %}
+                              <div class="comment">
+                                  {% if comment.autor.avatar and comment.autor.avatar.url %}<img src="{{ comment.autor.avatar.url }}" alt="Avatar de {{ comment.autor.user.username }}" class="post-avatar-placeholder comment-avatar-placeholder">
+                                  {% else %}<div class="post-avatar-placeholder comment-avatar-placeholder">{{ comment.autor.user.username|slice:":1"|upper }}</div>{% endif %}
+                                  <div class="comment-content">
+                                       <a href="{% url 'user_profile' username=comment.autor.user.username %}" class="comment-author">{{ comment.autor.user.username }}</a>
+                                      <p class="comment-text">{{ comment.texto|linebreaksbr }}</p>
+                                      <span class="comment-timestamp">{{ comment.criado_em|date:"d M, Y H:i" }}</span>
+                                  </div>
+                              </div>
+                          {% empty %}
+                              <p class="no-comments">Nenhum comentário ainda. Seja o primeiro!</p>
+                          {% endfor %}
+                      </div>
+                  </section>
+              </article>
+          {% endfor %}
+      {% else %}
+          <p class="no-posts">
+              {% if is_own_profile %}Você ainda não fez nenhuma postagem.
+              {% else %}{{ profile_user.user.username }} ainda não fez nenhuma postagem.{% endif %}
+          </p>
+      {% endif %}
+    </section>
+{% endblock content %}
